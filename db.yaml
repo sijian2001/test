@@ -1,0 +1,3 @@
+database:
+  url: "sqlite:///batch_example.db"
+  echo: true

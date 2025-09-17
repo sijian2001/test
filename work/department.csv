@@ -1,0 +1,6 @@
+id,name,description,manager_id,is_active
+1,Engineering,Software development and engineering team,101,true
+2,Marketing,Marketing and promotional activities,102,true
+3,Sales,Sales and customer relations,103,true
+4,Human Resources,HR and employee management,104,true
+5,Finance,Financial planning and accounting,105,true

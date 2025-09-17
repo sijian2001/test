@@ -1,0 +1,8 @@
+id,username,email,password_hash,first_name,last_name,department_id,is_active
+1,john.doe,john.doe@company.com,hashed_password_123,John,Doe,1,true
+2,jane.smith,jane.smith@company.com,hashed_password_456,Jane,Smith,2,true
+3,bob.johnson,bob.johnson@company.com,hashed_password_789,Bob,Johnson,3,true
+4,alice.brown,alice.brown@company.com,hashed_password_abc,Alice,Brown,4,true
+5,charlie.wilson,charlie.wilson@company.com,hashed_password_def,Charlie,Wilson,5,true
+6,diana.garcia,diana.garcia@company.com,hashed_password_ghi,Diana,Garcia,1,true
+7,edward.miller,edward.miller@company.com,hashed_password_jkl,Edward,Miller,2,true
