@@ -2,8 +2,8 @@
 
 import sys
 import logging
-from di_container import create_injector
-from batch.csv_import_processor import CsvImportProcessor
+from injector import Injector
+from batch.csv_import_processor import DataCsvImportProcessor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 def main():
     logger.info("Starting CSV Import Application...")
     
-    injector = create_injector()
-    
-    csv_import_processor = injector.get(CsvImportProcessor)
+    injector = Injector()
+
+    csv_import_processor = injector.get(DataCsvImportProcessor)
     
     success = csv_import_processor.run_csv_import_process()
     

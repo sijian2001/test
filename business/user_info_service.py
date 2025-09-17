@@ -4,7 +4,7 @@ from typing import List, Optional
 from injector import inject
 import logging
 from .abstract_service import AbstractService, AbstractInDto, AbstractOutDto
-from domain.repository.user_info_repository import AbstractUserInfoRepository
+from domain.repository.user_info_repository import UserInfoRepository
 from domain.model.user_info import UserInfo
 
 logging.basicConfig(level=logging.INFO)
@@ -36,7 +36,7 @@ class AbstractUserInfoService(AbstractService):
 @inject
 @dataclass
 class UserInfoService(AbstractUserInfoService):
-    user_info_repository: AbstractUserInfoRepository
+    user_info_repository: UserInfoRepository
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)

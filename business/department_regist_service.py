@@ -4,7 +4,7 @@ from typing import List
 from injector import inject
 import logging
 from business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
-from domain.repository.department_repository import AbstractDepartmentRepository
+from domain.repository.department_repository import DepartmentRepository
 from domain.vo.department_vo import DepartmentVo
 
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +25,7 @@ class AbstractDepartmentRegistService(AbstractService):
 @inject
 @dataclass
 class DepartmentRegistService(AbstractDepartmentRegistService):
-    department_repository: AbstractDepartmentRepository
+    department_repository: DepartmentRepository
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)

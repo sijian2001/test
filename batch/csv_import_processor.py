@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from injector import inject
 import logging
-from business.depart_user_regist_service import AbstractDepartUserRegistService, DepartUserRegistInDto
+from business.depart_user_regist_service import DepartUserRegistService, DepartUserRegistInDto
 from domain.vo.department_vo import DepartmentVo
 from domain.vo.user_vo import UserVo
 
@@ -18,7 +18,7 @@ class CsvImportProcessor(ABC):
 @inject
 @dataclass
 class DataCsvImportProcessor(CsvImportProcessor):
-    depart_user_regist_service: AbstractDepartUserRegistService
+    depart_user_regist_service: DepartUserRegistService
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)

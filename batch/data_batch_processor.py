@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from .processor import BatchProcessor
-from .csv_import_processor import CsvImportProcessor
+from .csv_import_processor import DataCsvImportProcessor
 from injector import inject
 import logging
 
 @inject
 @dataclass
 class DataBatchProcessor(BatchProcessor):
-    csv_import_processor: CsvImportProcessor
+    csv_import_processor: DataCsvImportProcessor
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)

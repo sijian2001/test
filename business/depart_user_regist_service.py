@@ -5,8 +5,8 @@ from injector import inject
 import logging
 from sqlalchemy.orm import Session
 from business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
-from business.department_regist_service import AbstractDepartmentRegistService, DepartmentRegistInDto
-from business.user_regist_service import AbstractUserRegistService, UserRegistInDto
+from business.department_regist_service import DepartmentRegistService, DepartmentRegistInDto
+from business.user_regist_service import UserRegistService, UserRegistInDto
 from business.decorators.session_manager import SessionManager
 from domain.database import DatabaseSession
 from domain.vo.department_vo import DepartmentVo
@@ -36,8 +36,8 @@ class AbstractDepartUserRegistService(AbstractService):
 @inject
 @dataclass
 class DepartUserRegistService(AbstractDepartUserRegistService):
-    department_regist_service: AbstractDepartmentRegistService
-    user_regist_service: AbstractUserRegistService
+    department_regist_service: DepartmentRegistService
+    user_regist_service: UserRegistService
     db_session: DatabaseSession
 
     def __post_init__(self):

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from injector import inject
 from dataclasses import dataclass
 import logging
-from business.user_info_service import AbstractUserInfoService, UserInfoSearchInDto
+from business.user_info_service import UserInfoService, UserInfoSearchInDto
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,7 +16,7 @@ class CsvExportProcessor(ABC):
 @inject
 @dataclass
 class UserInfoCsvExportProcessor(CsvExportProcessor):
-    user_info_service: AbstractUserInfoService
+    user_info_service: UserInfoService
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)

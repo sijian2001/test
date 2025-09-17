@@ -2,8 +2,8 @@
 
 import sys
 import logging
-from di_container import create_injector
-from batch.processor import BatchProcessor
+from injector import Injector
+from batch.data_batch_processor import DataBatchProcessor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 def main():
     logger.info("Starting Batch Processing Application...")
     
-    injector = create_injector()
+    injector = Injector()
 
-    batch_processor = injector.get(BatchProcessor)
+    batch_processor = injector.get(DataBatchProcessor)
     
     success = batch_processor.run_batch_process()
     

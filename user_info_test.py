@@ -2,8 +2,8 @@
 
 import sys
 import logging
-from di_container import create_injector
-from business.user_info_service import AbstractUserInfoService, UserInfoSearchInDto
+from injector import Injector
+from business.user_info_service import UserInfoService, UserInfoSearchInDto
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,8 +12,8 @@ def test_user_info_service():
     """Test UserInfoService functionality"""
     logger.info("Starting UserInfo Service Test...")
 
-    injector = create_injector()
-    user_info_service = injector.get(AbstractUserInfoService)
+    injector = Injector()
+    user_info_service = injector.get(UserInfoService)
 
     # Test 1: Get all user info
     logger.info("\n=== Test 1: Get All User Info ===")

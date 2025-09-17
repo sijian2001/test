@@ -9,6 +9,7 @@ from .model.user_info import UserInfo
 import yaml
 import os
 
+@singleton
 class DatabaseConfig:
     def __init__(self, config_path: str = "db.yaml"):
         self.config_path = config_path

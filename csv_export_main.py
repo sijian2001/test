@@ -2,8 +2,8 @@
 
 import sys
 import logging
-from di_container import create_injector
-from batch.csv_export_processor import CsvExportProcessor
+from injector import Injector
+from batch.csv_export_processor import UserInfoCsvExportProcessor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 def main():
     logger.info("Starting CSV Export Application...")
 
-    injector = create_injector()
+    injector = Injector()
 
-    csv_export_processor = injector.get(CsvExportProcessor)
+    csv_export_processor = injector.get(UserInfoCsvExportProcessor)
 
     success = csv_export_processor.run_csv_export_process()
 

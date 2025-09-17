@@ -4,7 +4,7 @@ from typing import List
 from injector import inject
 import logging
 from .abstract_service import AbstractService, AbstractInDto, AbstractOutDto
-from business.user_info_service import AbstractUserInfoService, UserInfoSearchInDto
+from business.user_info_service import UserInfoService, UserInfoSearchInDto
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,7 +31,7 @@ class AbstractCsvExportService(AbstractService):
 @inject
 @dataclass
 class CsvExportService(AbstractCsvExportService):
-    user_info_service: AbstractUserInfoService
+    user_info_service: UserInfoService
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)
