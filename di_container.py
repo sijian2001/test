@@ -21,16 +21,21 @@ def create_injector() -> Injector:
         from business.department_regist_service import AbstractDepartmentRegistService, DepartmentRegistService
         from business.user_regist_service import AbstractUserRegistService, UserRegistService
         from business.user_info_service import AbstractUserInfoService, UserInfoService
+        from business.csv_export_service import AbstractCsvExportService, CsvExportService
         binder.bind(AbstractDepartUserRegistService, to=DepartUserRegistService)
         binder.bind(AbstractDepartmentRegistService, to=DepartmentRegistService)
         binder.bind(AbstractUserRegistService, to=UserRegistService)
         binder.bind(AbstractUserInfoService, to=UserInfoService)
+        binder.bind(AbstractCsvExportService, to=CsvExportService)
 
         # Processor bindings
         from batch.processor import BatchProcessor
         from batch.data_batch_processor import DataBatchProcessor
         from batch.csv_import_processor import CsvImportProcessor, DataCsvImportProcessor
+        from batch.csv_export_processor import CsvExportProcessor, UserInfoCsvExportProcessor
+        from batch.csv_export_batch_processor import CsvExportBatchProcessor
         binder.bind(BatchProcessor, to=DataBatchProcessor)
         binder.bind(CsvImportProcessor, to=DataCsvImportProcessor)
+        binder.bind(CsvExportProcessor, to=UserInfoCsvExportProcessor)
 
     return Injector([configure_dependencies])

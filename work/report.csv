@@ -1,0 +1,8 @@
+user_id,username,department_name,is_active,created_at
+1,john.doe,Engineering,active,2025-09-17 17:47:03
+2,jane.smith,Marketing,active,2025-09-17 17:47:03
+3,bob.johnson,Sales,active,2025-09-17 17:47:03
+4,alice.brown,Human Resources,active,2025-09-17 17:47:03
+5,charlie.wilson,Finance,active,2025-09-17 17:47:03
+6,diana.garcia,Engineering,active,2025-09-17 17:47:03
+7,edward.miller,Marketing,active,2025-09-17 17:47:03
