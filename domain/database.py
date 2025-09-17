@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from .model.base import Base
 from .model.user import User
 from .model.department import Department
+from .model.user_info import UserInfo
 import yaml
 import os
 

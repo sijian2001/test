@@ -11,16 +11,20 @@ def create_injector() -> Injector:
         # Repository bindings
         from domain.repository.user_repository import AbstractUserRepository, UserRepository
         from domain.repository.department_repository import AbstractDepartmentRepository, DepartmentRepository
+        from domain.repository.user_info_repository import AbstractUserInfoRepository, UserInfoRepository
         binder.bind(AbstractUserRepository, to=UserRepository)
         binder.bind(AbstractDepartmentRepository, to=DepartmentRepository)
+        binder.bind(AbstractUserInfoRepository, to=UserInfoRepository)
 
         # Service bindings
         from business.depart_user_regist_service import AbstractDepartUserRegistService, DepartUserRegistService
         from business.department_regist_service import AbstractDepartmentRegistService, DepartmentRegistService
         from business.user_regist_service import AbstractUserRegistService, UserRegistService
+        from business.user_info_service import AbstractUserInfoService, UserInfoService
         binder.bind(AbstractDepartUserRegistService, to=DepartUserRegistService)
         binder.bind(AbstractDepartmentRegistService, to=DepartmentRegistService)
         binder.bind(AbstractUserRegistService, to=UserRegistService)
+        binder.bind(AbstractUserInfoService, to=UserInfoService)
 
         # Processor bindings
         from batch.processor import BatchProcessor
