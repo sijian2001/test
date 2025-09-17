@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, TIMESTAMP
 from sqlalchemy.sql import func
 from .base import Base
 
@@ -12,8 +12,8 @@ class User(Base):
     first_name = Column(String(50))
     last_name = Column(String(50))
     department_id = Column(Integer)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(TIMESTAMP, default=func.current_timestamp())
+    updated_at = Column(TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp())
     is_active = Column(Boolean, default=True)
     
     def __repr__(self):

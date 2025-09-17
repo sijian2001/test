@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, TIMESTAMP
 from sqlalchemy.sql import func
 from .base import Base
 
@@ -9,8 +9,8 @@ class Department(Base):
     name = Column(String(100), nullable=False, unique=True)
     description = Column(Text)
     manager_id = Column(Integer)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(TIMESTAMP, default=func.current_timestamp())
+    updated_at = Column(TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp())
     is_active = Column(Boolean, default=True)
     
     def __repr__(self):

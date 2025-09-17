@@ -2,3 +2,4 @@ sqlalchemy>=2.0.0
 injector>=0.20.0
 python-dotenv>=1.0.0
 PyYAML>=6.0
+PyMySQL>=1.0.0

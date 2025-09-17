@@ -8,6 +8,5 @@ CREATE TABLE user (
     department_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (department_id) REFERENCES department(id)
+    is_active BOOLEAN DEFAULT TRUE
 );

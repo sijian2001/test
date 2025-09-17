@@ -17,10 +17,10 @@ class DatabaseConfig:
         if os.path.exists(self.config_path):
             with open(self.config_path, 'r', encoding='utf-8') as file:
                 config = yaml.safe_load(file)
-                self.database_url = config.get('database', {}).get('url', "sqlite:///batch_example.db")
+                self.database_url = config.get('database', {}).get('url', "mysql+pymysql://user1:1234@localhost:3306/test1")
                 self.echo = config.get('database', {}).get('echo', True)
         else:
-            self.database_url = "sqlite:///batch_example.db"
+            self.database_url = "mysql+pymysql://user1:1234@localhost:3306/test1"
             self.echo = True
 
 @inject
