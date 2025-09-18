@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from batch.csv_export_processor import UserInfoCsvExportProcessor
 from business.user_info_service import UserInfoService, UserInfoSearchInDto, UserInfoOutDto
-from domain.model.user_info import UserInfo
+from domain.model.test1.user_info import UserInfo
 
 
 class TestUserInfoCsvExportProcessor:

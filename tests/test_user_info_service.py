@@ -8,8 +8,8 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from business.user_info_service import UserInfoService, UserInfoSearchInDto, UserInfoOutDto
-from domain.repository.user_info_repository import UserInfoRepository
-from domain.model.user_info import UserInfo
+from domain.repository.test1.user_info_repository import UserInfoRepository
+from domain.model.test1.user_info import UserInfo
 
 
 class TestUserInfoService:

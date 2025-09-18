@@ -4,7 +4,7 @@ from typing import List
 from injector import inject
 import logging
 from business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
-from domain.repository.user_repository import UserRepository
+from domain.repository.test1.user_repository import UserRepository
 from domain.vo.user_vo import UserVo
 
 logging.basicConfig(level=logging.INFO)

@@ -138,32 +138,56 @@ python -m pytest tests/test_user_info_service.py -v
 
 ```
 .
-├── batch/                          # バッチ処理関連
-│   ├── csv_export_processor.py   # CSV出力処理
-│   └── csv_import_processor.py   # CSV取込処理
-├── business/                       # ビジネスロジック
-│   ├── abstract_service.py       # サービス抽象クラス
-│   └── user_info_service.py      # ユーザー情報サービス
-├── domain/                         # ドメインモデル・リポジトリ
-│   ├── database.py               # データベース接続
-│   ├── model/                    # データモデル
-│   │   ├── base.py              # ベースモデル
-│   │   ├── department.py        # 部署モデル
-│   │   ├── user.py              # ユーザーモデル
-│   │   └── user_info.py         # ユーザー情報ビューモデル
-│   └── repository/               # リポジトリ
-│       └── user_info_repository.py # ユーザー情報リポジトリ
-├── sql/                           # SQLファイル
-├── tests/                         # 単体テスト
-│   ├── test_csv_export_processor.py  # CSV出力処理テスト
-│   ├── test_user_info_repository.py  # リポジトリテスト
-│   └── test_user_info_service.py     # サービステスト
-├── work/                          # 作業用ディレクトリ（CSV出力先）
-├── csv_export_main.py             # CSV出力メイン
-├── db.yaml                        # データベース設定
-├── main.py                        # CSV取込メイン
-├── requirements.txt               # Python依存関係
-└── README.md                     # このファイル
+├── batch/                                  # バッチ処理関連
+│   ├── csv_export_batch_processor.py     # CSV出力バッチ処理
+│   ├── csv_export_processor.py           # CSV出力処理
+│   ├── csv_import_processor.py           # CSV取込処理
+│   ├── data_batch_processor.py           # データバッチ処理
+│   └── processor.py                      # 処理基底クラス
+├── business/                               # ビジネスロジック
+│   ├── decorators/                        # デコレータ
+│   │   └── session_manager.py            # セッション管理デコレータ
+│   ├── abstract_service.py               # サービス抽象クラス
+│   ├── csv_export_service.py             # CSV出力サービス
+│   ├── depart_user_regist_service.py     # 部署ユーザー登録サービス
+│   ├── department_regist_service.py      # 部署登録サービス
+│   ├── user_info_service.py              # ユーザー情報サービス
+│   └── user_regist_service.py            # ユーザー登録サービス
+├── domain/                                 # ドメインモデル・リポジトリ
+│   ├── model/                             # データモデル
+│   │   ├── base.py                       # ベースモデル
+│   │   ├── department.py                 # 部署モデル
+│   │   ├── user.py                       # ユーザーモデル
+│   │   └── user_info.py                  # ユーザー情報ビューモデル
+│   ├── repository/                        # リポジトリ
+│   │   ├── department_repository.py      # 部署リポジトリ
+│   │   ├── user_info_repository.py       # ユーザー情報リポジトリ
+│   │   └── user_repository.py            # ユーザーリポジトリ
+│   ├── vo/                                # バリューオブジェクト
+│   │   ├── department_vo.py              # 部署VO
+│   │   └── user_vo.py                    # ユーザーVO
+│   └── database.py                        # データベース接続
+├── sql/                                    # SQLファイル
+│   ├── create_db_user.sql                # DB・ユーザー作成
+│   ├── create_department_table.sql       # 部署テーブル作成
+│   ├── create_user_info_view.sql         # ユーザー情報ビュー作成
+│   └── create_user_table.sql             # ユーザーテーブル作成
+├── tests/                                  # 単体テスト
+│   ├── test_csv_export_processor.py      # CSV出力処理テスト
+│   ├── test_user_info_repository.py      # リポジトリテスト
+│   └── test_user_info_service.py         # サービステスト
+├── work/                                   # 作業用ディレクトリ（CSV入出力）
+│   ├── department.csv                    # 部署CSVサンプル
+│   ├── report.csv                        # ユーザー情報出力
+│   └── user.csv                          # ユーザーCSVサンプル
+├── csv_export_main.py                      # CSV出力メインプログラム
+├── csv_import_main.py                      # CSV取込メインプログラム
+├── db.yaml                                 # データベース設定
+├── main.py                                 # 共通メインプログラム
+├── requirements.txt                        # Python依存関係
+├── setup.bat                               # Windows環境セットアップ
+├── setup.sh                               # Linux/macOS環境セットアップ
+└── README.md                              # このファイル
 ```
 
 ## 主要機能

@@ -4,8 +4,8 @@ from typing import List, Optional
 from injector import inject
 import logging
 from .abstract_service import AbstractService, AbstractInDto, AbstractOutDto
-from domain.repository.user_info_repository import UserInfoRepository
-from domain.model.user_info import UserInfo
+from domain.repository.test1.user_info_repository import UserInfoRepository
+from domain.model.test1.user_info import UserInfo
 
 logging.basicConfig(level=logging.INFO)
 

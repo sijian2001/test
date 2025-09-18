@@ -1,0 +1,11 @@
+category_name,category_description,parent_category_id
+Electronics,"Electronic devices and gadgets",
+Computer Accessories,"Accessories for computers and laptops",1
+Monitors,"Display monitors and screens",1
+Storage,"Data storage devices and solutions",1
+Audio,"Audio equipment and accessories",1
+Mobile Devices,"Smartphones and tablets",1
+Gaming,"Gaming equipment and accessories",1
+Networking,"Network equipment and connectivity",1
+Software,"Software applications and licenses",1
+Office Supplies,"General office and business supplies",

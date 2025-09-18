@@ -1,3 +1,7 @@
 database:
-  url: "mysql+pymysql://user1:1234@localhost:3306/test1"
-  echo: true
+  test1:
+    url: "mysql+pymysql://user1:1234@localhost:3306/test1"
+    echo: true
+  test2:
+    url: "mysql+pymysql://user2:1234@localhost:3306/test2"
+    echo: true

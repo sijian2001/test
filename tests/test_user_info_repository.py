@@ -7,8 +7,8 @@ import os
 # Add the parent directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from domain.repository.user_info_repository import UserInfoRepository
-from domain.model.user_info import UserInfo
+from domain.repository.test1.user_info_repository import UserInfoRepository
+from domain.model.test1.user_info import UserInfo
 from domain.database import DatabaseSession
 
 
