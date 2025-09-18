@@ -6,8 +6,8 @@ import os
 import csv
 from datetime import datetime
 
-# Add the parent directory to the path so we can import our modules
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# Add the project root directory to the path so we can import our modules
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from batch.csv_export_processor import UserInfoCsvExportProcessor
 from business.user_info_service import UserInfoService, UserInfoSearchInDto, UserInfoOutDto

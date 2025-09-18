@@ -33,17 +33,17 @@ class UserInfoRepository(AbstractUserInfoRepository):
         pass
 
     def get_all_user_info(self) -> List[UserInfo]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(UserInfo).all()
 
     def get_user_info_by_id(self, user_id: int) -> Optional[UserInfo]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(UserInfo).filter(UserInfo.user_id == user_id).first()
 
     def get_user_info_by_username(self, username: str) -> Optional[UserInfo]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(UserInfo).filter(UserInfo.username == username).first()
 
     def get_user_info_by_department(self, department_name: str) -> List[UserInfo]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(UserInfo).filter(UserInfo.department_name == department_name).all()

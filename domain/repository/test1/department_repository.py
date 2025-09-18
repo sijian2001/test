@@ -37,15 +37,15 @@ class DepartmentRepository(AbstractDepartmentRepository):
         pass
     
     def get_all_departments(self) -> List[Department]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(Department).all()
     
     def get_department_by_id(self, department_id: int) -> Optional[Department]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(Department).filter(Department.id == department_id).first()
     
     def create_department(self, name: str, description: str = None, manager_id: int = None) -> Department:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         department = Department(name=name, description=description, manager_id=manager_id)
         session.add(department)
         session.commit()
@@ -53,7 +53,7 @@ class DepartmentRepository(AbstractDepartmentRepository):
         return department
     
     def update_department(self, department_id: int, name: str = None, description: str = None, manager_id: int = None) -> Optional[Department]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         department = session.query(Department).filter(Department.id == department_id).first()
         if department:
             if name:
@@ -67,7 +67,7 @@ class DepartmentRepository(AbstractDepartmentRepository):
         return department
     
     def delete_department(self, department_id: int) -> bool:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         department = session.query(Department).filter(Department.id == department_id).first()
         if department:
             department.is_active = False

@@ -4,8 +4,8 @@ from typing import List, Optional
 import sys
 import os
 
-# Add the parent directory to the path so we can import our modules
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# Add the project root directory to the path so we can import our modules
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from business.user_info_service import UserInfoService, UserInfoSearchInDto, UserInfoOutDto
 from domain.repository.test1.user_info_repository import UserInfoRepository

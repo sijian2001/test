@@ -33,15 +33,15 @@ class UserRepository(AbstractUserRepository):
         pass
     
     def get_all_users(self) -> List[User]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(User).all()
     
     def get_user_by_id(self, user_id: int) -> Optional[User]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         return session.query(User).filter(User.id == user_id).first()
     
     def create_user(self, username: str, email: str, password_hash: str, first_name: str = None, last_name: str = None, department_id: int = None) -> User:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         user = User(username=username, email=email, password_hash=password_hash, first_name=first_name, last_name=last_name, department_id=department_id)
         session.add(user)
         session.commit()
@@ -49,7 +49,7 @@ class UserRepository(AbstractUserRepository):
         return user
     
     def update_user(self, user_id: int, username: str = None, email: str = None, first_name: str = None, last_name: str = None, department_id: int = None) -> Optional[User]:
-        session = self.db_session.get_session()
+        session = self.db_session.get_session("test1")
         user = session.query(User).filter(User.id == user_id).first()
         if user:
             if username:

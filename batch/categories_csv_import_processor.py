@@ -1,19 +1,22 @@
 import csv
+import logging
 import os
 from abc import ABC, abstractmethod
-from injector import inject
 from dataclasses import dataclass
-import logging
-from typing import List
+
+from injector import inject
+
 from business.category_regist_service import CategoryRegistService, CategoryRegistInDto
 from domain.vo.category_vo import CategoryVo
 
 logging.basicConfig(level=logging.INFO)
 
+
 class CategoriesCsvImportProcessor(ABC):
     @abstractmethod
     def run_csv_import_process(self) -> bool:
         pass
+
 
 @inject
 @dataclass
@@ -50,8 +53,10 @@ class CategoriesCsvImportProcessorImpl(CategoriesCsvImportProcessor):
                         # Create CategoryVo
                         category_vo = CategoryVo(
                             category_name=row['category_name'].strip(),
-                            category_description=row.get('category_description', '').strip() if row.get('category_description') else None,
-                            parent_category_id=int(row['parent_category_id']) if row.get('parent_category_id') and row['parent_category_id'].strip() else None
+                            category_description=row.get('category_description', '').strip() if row.get(
+                                'category_description') else None,
+                            parent_category_id=int(row['parent_category_id']) if row.get('parent_category_id') and row[
+                                'parent_category_id'].strip() else None
                         )
 
                         category_list.append(category_vo)

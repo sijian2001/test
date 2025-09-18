@@ -4,8 +4,8 @@ from typing import List, Optional
 import sys
 import os
 
-# Add the parent directory to the path so we can import our modules
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# Add the project root directory to the path so we can import our modules
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from domain.repository.test1.user_info_repository import UserInfoRepository
 from domain.model.test1.user_info import UserInfo
@@ -56,7 +56,7 @@ class TestUserInfoRepository:
         # Assert
         assert result == mock_user_info_list
         assert len(result) == 3
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
         self.mock_session.query.assert_called_once_with(UserInfo)
         self.mock_session.query.return_value.all.assert_called_once()
 
@@ -71,7 +71,7 @@ class TestUserInfoRepository:
         # Assert
         assert result == []
         assert len(result) == 0
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
 
     def test_get_user_info_by_id_success(self):
         """Test get_user_info_by_id returns user info when found"""
@@ -86,7 +86,7 @@ class TestUserInfoRepository:
         # Assert
         assert result == mock_user_info
         assert result.user_id == user_id
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
         self.mock_session.query.assert_called_once_with(UserInfo)
         self.mock_session.query.return_value.filter.assert_called_once()
         self.mock_session.query.return_value.filter.return_value.first.assert_called_once()
@@ -102,7 +102,7 @@ class TestUserInfoRepository:
 
         # Assert
         assert result is None
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
 
     def test_get_user_info_by_username_success(self):
         """Test get_user_info_by_username returns user info when found"""
@@ -117,7 +117,7 @@ class TestUserInfoRepository:
         # Assert
         assert result == mock_user_info
         assert result.username == username
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
         self.mock_session.query.assert_called_once_with(UserInfo)
 
     def test_get_user_info_by_username_not_found(self):
@@ -131,7 +131,7 @@ class TestUserInfoRepository:
 
         # Assert
         assert result is None
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
 
     def test_get_user_info_by_department_success(self):
         """Test get_user_info_by_department returns user info list when found"""
@@ -151,7 +151,7 @@ class TestUserInfoRepository:
         assert len(result) == 2
         for user_info in result:
             assert user_info.department_name == department_name
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
         self.mock_session.query.assert_called_once_with(UserInfo)
 
     def test_get_user_info_by_department_empty_result(self):
@@ -166,7 +166,7 @@ class TestUserInfoRepository:
         # Assert
         assert result == []
         assert len(result) == 0
-        self.mock_db_session.get_session.assert_called_once()
+        self.mock_db_session.get_session.assert_called_once_with("test1")
 
     def test_db_session_called_for_all_methods(self):
         """Test that db_session.get_session() is called for all methods"""
@@ -181,8 +181,11 @@ class TestUserInfoRepository:
         self.repository.get_user_info_by_username("test")
         self.repository.get_user_info_by_department("test")
 
-        # Assert get_session was called 4 times
+        # Assert get_session was called 4 times with "test1" parameter
         assert self.mock_db_session.get_session.call_count == 4
+        # Verify all calls were made with "test1" parameter
+        for call in self.mock_db_session.get_session.call_args_list:
+            assert call[0][0] == "test1"
 
     def test_post_init_method(self):
         """Test that __post_init__ method can be called without errors"""
