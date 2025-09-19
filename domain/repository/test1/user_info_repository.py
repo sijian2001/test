@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
-from injector import inject
 from dataclasses import dataclass
+from typing import List, Optional
+
+from injector import inject
+
+from domain.database import Test1DatabaseSession
 from domain.model.test1.user_info import UserInfo
-from domain.database import DatabaseSession
 
 
 class AbstractUserInfoRepository(ABC):
@@ -27,23 +29,19 @@ class AbstractUserInfoRepository(ABC):
 @inject
 @dataclass
 class UserInfoRepository(AbstractUserInfoRepository):
-    db_session: DatabaseSession
+    session: Test1DatabaseSession
 
     def __post_init__(self):
         pass
 
     def get_all_user_info(self) -> List[UserInfo]:
-        session = self.db_session.get_session("test1")
-        return session.query(UserInfo).all()
+        return self.session.query(UserInfo).all()
 
     def get_user_info_by_id(self, user_id: int) -> Optional[UserInfo]:
-        session = self.db_session.get_session("test1")
-        return session.query(UserInfo).filter(UserInfo.user_id == user_id).first()
+        return self.session.query(UserInfo).filter(UserInfo.user_id == user_id).first()
 
     def get_user_info_by_username(self, username: str) -> Optional[UserInfo]:
-        session = self.db_session.get_session("test1")
-        return session.query(UserInfo).filter(UserInfo.username == username).first()
+        return self.session.query(UserInfo).filter(UserInfo.username == username).first()
 
     def get_user_info_by_department(self, department_name: str) -> List[UserInfo]:
-        session = self.db_session.get_session("test1")
-        return session.query(UserInfo).filter(UserInfo.department_name == department_name).all()
+        return self.session.query(UserInfo).filter(UserInfo.department_name == department_name).all()

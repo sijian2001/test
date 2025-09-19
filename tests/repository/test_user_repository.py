@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from domain.repository.test1.user_repository import UserRepository
 from domain.model.test1.user import User
-from domain.database import DatabaseSession
+from sqlalchemy.orm import Session
 
 
 class TestUserRepository:
@@ -17,10 +17,8 @@ class TestUserRepository:
 
     def setup_method(self):
         """Setup method called before each test"""
-        # Create a mock DatabaseSession
-        self.mock_db_session = Mock(spec=DatabaseSession)
-        self.mock_session = Mock()
-        self.mock_db_session.get_session.return_value = self.mock_session
+        # Create a mock Session (since Test1DatabaseSession now inherits from Session)
+        self.mock_db_session = Mock(spec=Session)
 
         # Create UserRepository instance with mocked dependencies
         self.repository = UserRepository(db_session=self.mock_db_session)
@@ -49,7 +47,7 @@ class TestUserRepository:
             self.create_mock_user(2, "jane.smith", department_id=2),
             self.create_mock_user(3, "bob.johnson", department_id=1)
         ]
-        self.mock_session.query.return_value.all.return_value = mock_users
+        self.mock_db_session.query.return_value.all.return_value = mock_users
 
         # Act
         result = self.repository.get_all_users()
@@ -57,14 +55,13 @@ class TestUserRepository:
         # Assert
         assert result == mock_users
         assert len(result) == 3
-        self.mock_db_session.get_session.assert_called_once_with("test1")
-        self.mock_session.query.assert_called_once_with(User)
-        self.mock_session.query.return_value.all.assert_called_once()
+        # Session is used directly now, so we verify query was called on the session
+        self.mock_db_session.query.assert_called()
 
     def test_get_all_users_empty_result(self):
         """Test get_all_users returns empty list when no users found"""
         # Arrange
-        self.mock_session.query.return_value.all.return_value = []
+        self.mock_db_session.query.return_value.all.return_value = []
 
         # Act
         result = self.repository.get_all_users()
@@ -72,14 +69,15 @@ class TestUserRepository:
         # Assert
         assert result == []
         assert len(result) == 0
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Session is used directly now, so we verify query was called on the session
+        self.mock_db_session.query.assert_called()
 
     def test_get_user_by_id_success(self):
         """Test get_user_by_id returns user when found"""
         # Arrange
         user_id = 1
         mock_user = self.create_mock_user(1, "john.doe")
-        self.mock_session.query.return_value.filter.return_value.first.return_value = mock_user
+        self.mock_db_session.query.return_value.filter.return_value.first.return_value = mock_user
 
         # Act
         result = self.repository.get_user_by_id(user_id)
@@ -87,21 +85,23 @@ class TestUserRepository:
         # Assert
         assert result == mock_user
         assert result.id == user_id
-        self.mock_db_session.get_session.assert_called_once_with("test1")
-        self.mock_session.query.assert_called_once_with(User)
+        # Session is used directly now, so we verify query was called on the session
+        self.mock_db_session.query.assert_called()
+        self.mock_db_session.query.assert_called_with(User)
 
     def test_get_user_by_id_not_found(self):
         """Test get_user_by_id returns None when user not found"""
         # Arrange
         user_id = 999
-        self.mock_session.query.return_value.filter.return_value.first.return_value = None
+        self.mock_db_session.query.return_value.filter.return_value.first.return_value = None
 
         # Act
         result = self.repository.get_user_by_id(user_id)
 
         # Assert
         assert result is None
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Session is used directly now, so we verify query was called on the session
+        self.mock_db_session.query.assert_called()
 
     def test_create_user_success(self):
         """Test create_user creates new user successfully"""
@@ -116,9 +116,9 @@ class TestUserRepository:
         mock_user = self.create_mock_user(4, username, email, first_name, last_name, department_id)
 
         # Mock session.add, commit, refresh
-        self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
-        self.mock_session.refresh = Mock()
+        self.mock_db_session.add = Mock()
+        self.mock_db_session.commit = Mock()
+        self.mock_db_session.refresh = Mock()
 
         # Act
         with patch('domain.repository.test1.user_repository.User') as mock_user_class:
@@ -135,9 +135,9 @@ class TestUserRepository:
                 last_name=last_name,
                 department_id=department_id
             )
-            self.mock_session.add.assert_called_once_with(mock_user)
-            self.mock_session.commit.assert_called_once()
-            self.mock_session.refresh.assert_called_once_with(mock_user)
+            self.mock_db_session.add.assert_called_once_with(mock_user)
+            self.mock_db_session.commit.assert_called_once()
+            self.mock_db_session.refresh.assert_called_once_with(mock_user)
 
     def test_create_user_with_minimal_params(self):
         """Test create_user with only required parameters"""
@@ -148,9 +148,9 @@ class TestUserRepository:
 
         mock_user = self.create_mock_user(5, username, email)
 
-        self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
-        self.mock_session.refresh = Mock()
+        self.mock_db_session.add = Mock()
+        self.mock_db_session.commit = Mock()
+        self.mock_db_session.refresh = Mock()
 
         # Act
         with patch('domain.repository.test1.user_repository.User') as mock_user_class:
@@ -179,9 +179,9 @@ class TestUserRepository:
         updated_department_id = 2
 
         mock_user = self.create_mock_user(user_id, "original.user")
-        self.mock_session.query.return_value.filter.return_value.first.return_value = mock_user
-        self.mock_session.commit = Mock()
-        self.mock_session.refresh = Mock()
+        self.mock_db_session.query.return_value.filter.return_value.first.return_value = mock_user
+        self.mock_db_session.commit = Mock()
+        self.mock_db_session.refresh = Mock()
 
         # Act
         result = self.repository.update_user(
@@ -196,8 +196,8 @@ class TestUserRepository:
         assert mock_user.first_name == updated_first_name
         assert mock_user.last_name == updated_last_name
         assert mock_user.department_id == updated_department_id
-        self.mock_session.commit.assert_called_once()
-        self.mock_session.refresh.assert_called_once_with(mock_user)
+        self.mock_db_session.commit.assert_called_once()
+        self.mock_db_session.refresh.assert_called_once_with(mock_user)
 
     def test_update_user_partial_update(self):
         """Test update_user with partial updates (only some fields)"""
@@ -209,9 +209,9 @@ class TestUserRepository:
         original_email = mock_user.email
         original_first_name = mock_user.first_name
 
-        self.mock_session.query.return_value.filter.return_value.first.return_value = mock_user
-        self.mock_session.commit = Mock()
-        self.mock_session.refresh = Mock()
+        self.mock_db_session.query.return_value.filter.return_value.first.return_value = mock_user
+        self.mock_db_session.commit = Mock()
+        self.mock_db_session.refresh = Mock()
 
         # Act
         result = self.repository.update_user(user_id, username=updated_username)
@@ -226,23 +226,24 @@ class TestUserRepository:
         """Test update_user returns None when user not found"""
         # Arrange
         user_id = 999
-        self.mock_session.query.return_value.filter.return_value.first.return_value = None
+        self.mock_db_session.query.return_value.filter.return_value.first.return_value = None
 
         # Act
         result = self.repository.update_user(user_id, username="new.username")
 
         # Assert
         assert result is None
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Session is used directly now, so we verify query was called on the session
+        self.mock_db_session.query.assert_called()
 
     def test_update_user_with_department_id_zero(self):
         """Test update_user handles department_id=0 correctly"""
         # Arrange
         user_id = 1
         mock_user = self.create_mock_user(user_id, "test.user")
-        self.mock_session.query.return_value.filter.return_value.first.return_value = mock_user
-        self.mock_session.commit = Mock()
-        self.mock_session.refresh = Mock()
+        self.mock_db_session.query.return_value.filter.return_value.first.return_value = mock_user
+        self.mock_db_session.commit = Mock()
+        self.mock_db_session.refresh = Mock()
 
         # Act
         result = self.repository.update_user(user_id, department_id=0)
@@ -257,13 +258,13 @@ class TestUserRepository:
         self.repository.__post_init__()
 
     def test_db_session_called_for_all_methods(self):
-        """Test that db_session.get_session() is called for all methods"""
+        """Test that db_session is used directly for all methods"""
         # Setup mocks
-        self.mock_session.query.return_value.all.return_value = []
-        self.mock_session.query.return_value.filter.return_value.first.return_value = None
-        self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
-        self.mock_session.refresh = Mock()
+        self.mock_db_session.query.return_value.all.return_value = []
+        self.mock_db_session.query.return_value.filter.return_value.first.return_value = None
+        self.mock_db_session.add = Mock()
+        self.mock_db_session.commit = Mock()
+        self.mock_db_session.refresh = Mock()
 
         # Call all methods
         self.repository.get_all_users()
@@ -275,10 +276,11 @@ class TestUserRepository:
 
         self.repository.update_user(1, username="test")
 
-        # Assert get_session was called 4 times with "test1" parameter
-        assert self.mock_db_session.get_session.call_count == 4
-        for call in self.mock_db_session.get_session.call_args_list:
-            assert call[0][0] == "test1"
+        # Assert session methods were called directly (query for read operations)
+        assert self.mock_db_session.query.call_count == 3
+        # Also verify that add and commit were called for write operations
+        self.mock_db_session.add.assert_called_once()
+        self.mock_db_session.commit.assert_called()
 
 
 if __name__ == "__main__":

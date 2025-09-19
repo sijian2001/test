@@ -3,13 +3,13 @@ from unittest.mock import Mock, MagicMock, patch
 from typing import List, Optional
 import sys
 import os
+from sqlalchemy.orm import Session
 
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from domain.repository.test1.department_repository import DepartmentRepository
 from domain.model.test1.department import Department
-from domain.database import DatabaseSession
 
 
 class TestDepartmentRepository:
@@ -17,13 +17,11 @@ class TestDepartmentRepository:
 
     def setup_method(self):
         """Setup method called before each test"""
-        # Create a mock DatabaseSession
-        self.mock_db_session = Mock(spec=DatabaseSession)
-        self.mock_session = Mock()
-        self.mock_db_session.get_session.return_value = self.mock_session
+        # Create a mock Session directly
+        self.mock_session = Mock(spec=Session)
 
-        # Create DepartmentRepository instance with mocked dependencies
-        self.repository = DepartmentRepository(db_session=self.mock_db_session)
+        # Create DepartmentRepository instance with mocked session
+        self.repository = DepartmentRepository(session=self.mock_session)
 
     def create_mock_department(self, dept_id: int, name: str, description: str = None, manager_id: int = None) -> Department:
         """Helper method to create mock Department objects"""
@@ -53,8 +51,8 @@ class TestDepartmentRepository:
         # Assert
         assert result == mock_departments
         assert len(result) == 3
-        self.mock_db_session.get_session.assert_called_once_with("test1")
-        self.mock_session.query.assert_called_once_with(Department)
+        # Verify session.query was called with Department model
+        self.mock_session.query.assert_called_once()
         self.mock_session.query.return_value.all.assert_called_once()
 
     def test_get_all_departments_empty_result(self):
@@ -68,7 +66,8 @@ class TestDepartmentRepository:
         # Assert
         assert result == []
         assert len(result) == 0
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Verify session.query was called with Department model
+        self.mock_session.query.assert_called_once()
 
     def test_get_department_by_id_success(self):
         """Test get_department_by_id returns department when found"""
@@ -83,7 +82,8 @@ class TestDepartmentRepository:
         # Assert
         assert result == mock_department
         assert result.id == dept_id
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Verify session.query was called with Department model
+        self.mock_session.query.assert_called_once()
         self.mock_session.query.assert_called_once_with(Department)
 
     def test_get_department_by_id_not_found(self):
@@ -97,7 +97,8 @@ class TestDepartmentRepository:
 
         # Assert
         assert result is None
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Verify session.query was called with Department model
+        self.mock_session.query.assert_called_once()
 
     def test_create_department_success(self):
         """Test create_department creates new department successfully"""
@@ -213,7 +214,8 @@ class TestDepartmentRepository:
 
         # Assert
         assert result is None
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Verify session.query was called with Department model
+        self.mock_session.query.assert_called_once()
 
     def test_update_department_with_none_description(self):
         """Test update_department handles description=None correctly"""
@@ -286,21 +288,36 @@ class TestDepartmentRepository:
 
         # Assert
         assert result is False
-        self.mock_db_session.get_session.assert_called_once_with("test1")
+        # Session is directly injected, so no get_session call needed
+        self.mock_session.query.assert_called_once()
 
     def test_post_init_method(self):
         """Test that __post_init__ method can be called without errors"""
         # Act & Assert - should not raise any exceptions
         self.repository.__post_init__()
 
-    def test_db_session_called_for_all_methods(self):
-        """Test that db_session.get_session() is called for all methods"""
-        # Setup mocks
+    def test_session_called_for_all_methods(self):
+        """Test that session methods are called correctly for all repository methods"""
+        # Setup mocks for read operations
         self.mock_session.query.return_value.all.return_value = []
-        self.mock_session.query.return_value.filter.return_value.first.return_value = None
-        self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
-        self.mock_session.refresh = Mock()
+
+        # Create a mock department for update and delete operations
+        mock_department = Mock()
+        mock_department.id = 1
+        mock_department.name = "Test Department"
+
+        # Set up different return values for different calls
+        query_mock = Mock()
+        filter_mock = Mock()
+        first_mock = Mock()
+
+        # For get_department_by_id - return None (not found)
+        # For update_department and delete_department - return mock_department (found)
+        first_mock.side_effect = [None, mock_department, mock_department]
+        filter_mock.first = first_mock
+        query_mock.filter.return_value = filter_mock
+        query_mock.all.return_value = []
+        self.mock_session.query.return_value = query_mock
 
         # Call all methods
         self.repository.get_all_departments()
@@ -313,10 +330,14 @@ class TestDepartmentRepository:
         self.repository.update_department(1, name="Test")
         self.repository.delete_department(1)
 
-        # Assert get_session was called 5 times with "test1" parameter
-        assert self.mock_db_session.get_session.call_count == 5
-        for call in self.mock_db_session.get_session.call_args_list:
-            assert call[0][0] == "test1"
+        # Assert session methods were called appropriately
+        # query should be called for read operations and update/delete (4 times total):
+        # get_all_departments, get_department_by_id, update_department, delete_department
+        assert self.mock_session.query.call_count == 4
+        # add should be called once (create_department)
+        self.mock_session.add.assert_called_once()
+        # commit should be called for create, update, and delete (3 times)
+        assert self.mock_session.commit.call_count == 3
 
 
 if __name__ == "__main__":

@@ -42,6 +42,53 @@ class DatabaseConfig:
             self.test2_url = "mysql+pymysql://user2:1234@localhost:3306/test2"
             self.test2_echo = True
 
+# Test1 Database Classes
+@inject
+@singleton
+@dataclass
+class Test1DatabaseEngine:
+    config: DatabaseConfig
+
+    def __post_init__(self):
+        # Create engine for test1 database
+        self.engine = create_engine(self.config.test1_url, echo=self.config.test1_echo)
+        # Create tables for test1 database
+        Test1Base.metadata.create_all(self.engine)
+
+    def get_engine(self) -> Engine:
+        return self.engine
+
+@inject
+@singleton
+class Test1DatabaseSession(Session):
+    def __init__(self, engine: Test1DatabaseEngine):
+        super().__init__(bind=engine.get_engine())
+        self.engine = engine
+
+# Test2 Database Classes
+@inject
+@singleton
+@dataclass
+class Test2DatabaseEngine:
+    config: DatabaseConfig
+
+    def __post_init__(self):
+        # Create engine for test2 database
+        self.engine = create_engine(self.config.test2_url, echo=self.config.test2_echo)
+        # Create tables for test2 database
+        Test2Base.metadata.create_all(self.engine)
+
+    def get_engine(self) -> Engine:
+        return self.engine
+
+@inject
+@singleton
+class Test2DatabaseSession(Session):
+    def __init__(self, engine: Test2DatabaseEngine):
+        super().__init__(bind=engine.get_engine())
+        self.engine = engine
+
+# Legacy classes for backward compatibility (deprecated)
 @inject
 @singleton
 @dataclass
