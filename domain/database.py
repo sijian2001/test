@@ -1,3 +1,5 @@
+import warnings
+import functools
 from injector import inject, singleton
 from dataclasses import dataclass
 from sqlalchemy import create_engine, Engine
@@ -11,6 +13,43 @@ from .model.test2.category import Category
 from .model.test2.product import Product
 import yaml
 import os
+
+
+def deprecated(reason):
+    """
+    This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used.
+    """
+    def decorator(func_or_class):
+        if isinstance(func_or_class, type):
+            # If it's a class, warn when it's instantiated
+            original_init = func_or_class.__init__
+
+            @functools.wraps(original_init)
+            def new_init(self, *args, **kwargs):
+                warnings.warn(
+                    f"{func_or_class.__name__} is deprecated: {reason}",
+                    DeprecationWarning,
+                    stacklevel=2
+                )
+                original_init(self, *args, **kwargs)
+
+            func_or_class.__init__ = new_init
+            return func_or_class
+        else:
+            # If it's a function
+            @functools.wraps(func_or_class)
+            def new_func(*args, **kwargs):
+                warnings.warn(
+                    f"{func_or_class.__name__} is deprecated: {reason}",
+                    DeprecationWarning,
+                    stacklevel=2
+                )
+                return func_or_class(*args, **kwargs)
+            return new_func
+    return decorator
+
 
 @singleton
 class DatabaseConfig:
@@ -89,6 +128,51 @@ class Test2DatabaseSession(Session):
         self.engine = engine
 
 # Legacy classes for backward compatibility (deprecated)
+#
+# MIGRATION GUIDE:
+# ================
+# The DatabaseEngine and DatabaseSession classes are deprecated and will be removed in a future version.
+# Please migrate to the new session classes as follows:
+#
+# OLD WAY (deprecated):
+# ```python
+# from domain.database import DatabaseSession
+#
+# @inject
+# @dataclass
+# class SomeRepository:
+#     db_session: DatabaseSession
+#
+#     def some_method(self):
+#         session = self.db_session.get_session("test1")  # or "test2"
+#         return session.query(SomeModel).all()
+# ```
+#
+# NEW WAY (recommended):
+# ```python
+# from domain.database import Test1DatabaseSession, Test2DatabaseSession
+#
+# @inject
+# @dataclass
+# class SomeRepository:
+#     session: Test1DatabaseSession  # or Test2DatabaseSession
+#
+#     def some_method(self):
+#         return self.session.query(SomeModel).all()
+# ```
+#
+# Benefits of the new approach:
+# - Better type safety and IDE support
+# - Simplified code with direct session access
+# - Clearer separation between different databases
+# - Follows modern SQLAlchemy patterns
+#
+# Migration steps:
+# 1. Replace DatabaseSession with Test1DatabaseSession or Test2DatabaseSession
+# 2. Change parameter name from 'db_session' to 'session' for consistency
+# 3. Remove get_session() calls and use the session directly
+# 4. Update unit tests to mock Session directly instead of DatabaseSession
+@deprecated("Use Test1DatabaseEngine and Test2DatabaseEngine instead. This class will be removed in a future version.")
 @inject
 @singleton
 @dataclass
@@ -112,6 +196,7 @@ class DatabaseEngine:
         else:
             raise ValueError(f"Unknown database: {database}")
 
+@deprecated("Use Test1DatabaseSession and Test2DatabaseSession instead. This class will be removed in a future version.")
 @inject
 @singleton
 @dataclass
