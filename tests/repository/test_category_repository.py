@@ -208,7 +208,7 @@ class TestCategoryRepository:
 
         # Mock session.add, commit, refresh
         self.mock_db_session.add = Mock()
-        self.mock_db_session.commit = Mock()
+        self.mock_db_session.flush = Mock()
         self.mock_db_session.refresh = Mock()
 
         # Act
@@ -217,7 +217,7 @@ class TestCategoryRepository:
         # Assert
         assert result == mock_category
         self.mock_db_session.add.assert_called_once_with(mock_category)
-        self.mock_db_session.commit.assert_called_once()
+        self.mock_db_session.flush.assert_called_once()
         self.mock_db_session.refresh.assert_called_once_with(mock_category)
 
     def test_update_category_success(self):
@@ -227,7 +227,7 @@ class TestCategoryRepository:
 
         # Mock session.merge, commit
         self.mock_db_session.merge = Mock(return_value=mock_category)
-        self.mock_db_session.commit = Mock()
+        self.mock_db_session.flush = Mock()
 
         # Act
         result = self.repository.update_category(mock_category)
@@ -235,7 +235,7 @@ class TestCategoryRepository:
         # Assert
         assert result == mock_category
         self.mock_db_session.merge.assert_called_once_with(mock_category)
-        self.mock_db_session.commit.assert_called_once()
+        self.mock_db_session.flush.assert_called_once()
 
     def test_delete_category_success(self):
         """Test delete_category deletes existing category successfully"""
@@ -246,7 +246,7 @@ class TestCategoryRepository:
         # Mock get_category_by_id to return the category
         with patch.object(self.repository, 'get_category_by_id', return_value=mock_category):
             self.mock_db_session.delete = Mock()
-            self.mock_db_session.commit = Mock()
+            self.mock_db_session.flush = Mock()
 
             # Act
             result = self.repository.delete_category(category_id)
@@ -254,7 +254,7 @@ class TestCategoryRepository:
             # Assert
             assert result is True
             self.mock_db_session.delete.assert_called_once_with(mock_category)
-            self.mock_db_session.commit.assert_called_once()
+            self.mock_db_session.flush.assert_called_once()
 
     def test_delete_category_not_found(self):
         """Test delete_category returns False when category not found"""
@@ -283,7 +283,7 @@ class TestCategoryRepository:
         self.mock_db_session.query.return_value.filter.return_value.first.return_value = None
         self.mock_db_session.query.return_value.filter.return_value.all.return_value = []
         self.mock_db_session.add = Mock()
-        self.mock_db_session.commit = Mock()
+        self.mock_db_session.flush = Mock()
         self.mock_db_session.refresh = Mock()
         self.mock_db_session.merge = Mock()
         self.mock_db_session.delete = Mock()
@@ -308,7 +308,7 @@ class TestCategoryRepository:
         # Add, merge, commit should be called for write operations
         self.mock_db_session.add.assert_called()
         self.mock_db_session.merge.assert_called()
-        self.mock_db_session.commit.assert_called()
+        self.mock_db_session.flush.assert_called()
 
 
 if __name__ == "__main__":

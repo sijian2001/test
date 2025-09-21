@@ -43,7 +43,7 @@ class UserRepository(AbstractUserRepository):
     def create_user(self, username: str, email: str, password_hash: str, first_name: str = None, last_name: str = None, department_id: int = None) -> User:
         user = User(username=username, email=email, password_hash=password_hash, first_name=first_name, last_name=last_name, department_id=department_id)
         self.session.add(user)
-        self.session.commit()
+        self.session.flush()
         self.session.refresh(user)
         return user
     
@@ -60,6 +60,6 @@ class UserRepository(AbstractUserRepository):
                 user.last_name = last_name
             if department_id is not None:
                 user.department_id = department_id
-            self.session.commit()
+            self.session.flush()
             self.session.refresh(user)
         return user

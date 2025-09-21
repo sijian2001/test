@@ -49,7 +49,7 @@ class DepartmentRepository(AbstractDepartmentRepository):
     def create_department(self, name: str, description: str = None, manager_id: int = None) -> Department:
         department = Department(name=name, description=description, manager_id=manager_id)
         self.session.add(department)
-        self.session.commit()
+        self.session.flush()
         self.session.refresh(department)
         return department
 
@@ -63,7 +63,7 @@ class DepartmentRepository(AbstractDepartmentRepository):
                 department.description = description
             if manager_id is not None:
                 department.manager_id = manager_id
-            self.session.commit()
+            self.session.flush()
             self.session.refresh(department)
         return department
 
@@ -71,6 +71,6 @@ class DepartmentRepository(AbstractDepartmentRepository):
         department = self.session.query(Department).filter(Department.id == department_id).first()
         if department:
             department.is_active = False
-            self.session.commit()
+            self.session.flush()
             return True
         return False
