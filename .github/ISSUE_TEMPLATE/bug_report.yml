@@ -1,0 +1,105 @@
+name: バグレポート
+description: バグや問題を報告する
+title: "[Bug] "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        バグレポートをありがとうございます。以下の情報を提供していただくことで、問題の特定と修正がスムーズに行えます。
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 問題の説明
+      description: 発生している問題について詳しく説明してください
+      placeholder: 何が起こっているか、期待される動作との違いを記述してください
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 再現手順
+      description: 問題を再現するための具体的な手順を記載してください
+      placeholder: |
+        1. '...'に移動する
+        2. '...'をクリックする
+        3. '...'を入力する
+        4. エラーが発生する
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待される動作
+      description: 本来どのような動作になるべきかを記述してください
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の動作
+      description: 実際に何が起こっているかを記述してください
+    validations:
+      required: true
+
+  - type: dropdown
+    id: database
+    attributes:
+      label: 影響するデータベース
+      description: どのデータベースに関連する問題ですか？
+      options:
+        - test1（ユーザー管理システム）
+        - test2（商品管理システム）
+        - 両方
+        - 不明
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 影響するコンポーネント
+      description: どのコンポーネントに関連する問題ですか？
+      options:
+        - CSVインポート処理
+        - CSVエクスポート処理
+        - ユーザー管理
+        - 部署管理
+        - 商品管理
+        - カテゴリ管理
+        - データベース接続
+        - その他
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境情報
+      description: 実行環境の詳細を記載してください
+      placeholder: |
+        - OS: [例: Windows 10, Ubuntu 20.04]
+        - Python バージョン: [例: 3.9.0]
+        - MySQL バージョン: [例: 8.0.25]
+        - 仮想環境: [例: venv, conda]
+    validations:
+      required: true
+
+  - type: textarea
+    id: error_logs
+    attributes:
+      label: エラーログ・スタックトレース
+      description: エラーメッセージやスタックトレースがある場合は貼り付けてください
+      render: shell
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 追加情報
+      description: その他、問題解決に役立つ情報があれば記載してください（スクリーンショット、関連するファイルなど）

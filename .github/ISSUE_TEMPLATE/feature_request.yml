@@ -1,0 +1,103 @@
+name: 機能リクエスト
+description: 新機能や改善の提案
+title: "[Feature] "
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        機能リクエストをありがとうございます。新機能や改善についてのご提案をお聞かせください。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 解決したい課題
+      description: この機能リクエストが解決する課題や問題について説明してください
+      placeholder: 現在の問題点や困っていることを記述してください
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 提案する解決策
+      description: どのような機能や改善を希望しますか？
+      placeholder: 具体的な機能や改善案を記述してください
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 対象コンポーネント
+      description: どのコンポーネントに関連する機能ですか？
+      options:
+        - CSVインポート処理
+        - CSVエクスポート処理
+        - ユーザー管理
+        - 部署管理
+        - 商品管理
+        - カテゴリ管理
+        - データベース機能
+        - 新規コンポーネント
+        - その他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      description: この機能の優先度はどの程度ですか？
+      options:
+        - 高（緊急に必要）
+        - 中（近いうちに必要）
+        - 低（あったら便利）
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 代替案
+      description: 他に検討した解決策があれば記述してください
+
+  - type: textarea
+    id: use_cases
+    attributes:
+      label: 使用例・シナリオ
+      description: この機能をどのような場面で使用しますか？具体的な使用例を記述してください
+      placeholder: |
+        例：
+        1. ユーザーが大量データをインポートする際に...
+        2. 月次レポート作成時に...
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: 受け入れ条件
+      description: この機能が完成したと判断する条件を記述してください
+      placeholder: |
+        - [ ] ...ができるようになる
+        - [ ] ...が改善される
+        - [ ] パフォーマンスが...向上する
+
+  - type: dropdown
+    id: breaking_changes
+    attributes:
+      label: 破壊的変更
+      description: この機能は既存の機能に影響を与えますか？
+      options:
+        - いいえ（既存機能に影響なし）
+        - はい（既存機能に影響あり）
+        - 不明
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 追加情報
+      description: その他、この機能に関する補足情報があれば記載してください（参考資料、類似システムの例など）

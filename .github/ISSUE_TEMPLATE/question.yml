@@ -1,0 +1,94 @@
+name: 質問・サポート
+description: 使用方法や技術的な質問
+title: "[Question] "
+labels: ["question"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ご質問をありがとうございます。技術的な質問や使用方法について、詳細をお聞かせください。
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 質問内容
+      description: 具体的な質問を記述してください
+      placeholder: 何について知りたいか、どのような問題で困っているかを記述してください
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 質問カテゴリ
+      description: どのような種類の質問ですか？
+      options:
+        - 環境セットアップ
+        - CSVインポート・エクスポート
+        - データベース設定
+        - ユーザー管理機能
+        - 商品管理機能
+        - テスト実行
+        - エラーの解決方法
+        - 開発方法・カスタマイズ
+        - その他
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 背景・状況
+      description: 質問の背景や現在の状況を説明してください
+      placeholder: |
+        - 何をしようとしているか
+        - どこまで進んでいるか
+        - 何で詰まっているか
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 試したこと
+      description: 既に試したことがあれば記述してください
+      placeholder: |
+        - 調べたドキュメント
+        - 実行したコマンド
+        - 試した設定変更など
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境情報
+      description: 実行環境の詳細を記載してください（該当する場合）
+      placeholder: |
+        - OS: [例: Windows 10, Ubuntu 20.04]
+        - Python バージョン: [例: 3.9.0]
+        - MySQL バージョン: [例: 8.0.25]
+        - 仮想環境: [例: venv, conda]
+
+  - type: textarea
+    id: expected_outcome
+    attributes:
+      label: 期待する結果
+      description: 最終的にどのような状態になることを期待していますか？
+      placeholder: 質問が解決されたときに、どのようなことができるようになりたいかを記述してください
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: 緊急度
+      description: この質問の緊急度はどの程度ですか？
+      options:
+        - 高（すぐに解決が必要）
+        - 中（数日以内に解決したい）
+        - 低（時間があるときでよい）
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: 追加情報
+      description: その他、質問に関連する情報があれば記載してください（設定ファイル、エラーログなど）

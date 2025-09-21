@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 ドキュメント
+    url: ./README.md
+    about: READMEファイルで使用方法を確認してください
+  - name: 🏗️ アーキテクチャガイド
+    url: ./CLAUDE.md
+    about: システムアーキテクチャと開発ガイドラインを確認してください
+  - name: 🗃️ データベース設計
+    url: ./document/db/
+    about: テーブル定義書でデータベース設計を確認してください
