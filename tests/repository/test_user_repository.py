@@ -117,7 +117,7 @@ class TestUserRepository:
 
         # Mock session.add, commit, refresh
         self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -136,7 +136,7 @@ class TestUserRepository:
                 department_id=department_id
             )
             self.mock_session.add.assert_called_once_with(mock_user)
-            self.mock_session.commit.assert_called_once()
+            self.mock_session.flush.assert_called_once()
             self.mock_session.refresh.assert_called_once_with(mock_user)
 
     def test_create_user_with_minimal_params(self):
@@ -149,7 +149,7 @@ class TestUserRepository:
         mock_user = self.create_mock_user(5, username, email)
 
         self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -180,7 +180,7 @@ class TestUserRepository:
 
         mock_user = self.create_mock_user(user_id, "original.user")
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_user
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -196,7 +196,7 @@ class TestUserRepository:
         assert mock_user.first_name == updated_first_name
         assert mock_user.last_name == updated_last_name
         assert mock_user.department_id == updated_department_id
-        self.mock_session.commit.assert_called_once()
+        self.mock_session.flush.assert_called_once()
         self.mock_session.refresh.assert_called_once_with(mock_user)
 
     def test_update_user_partial_update(self):
@@ -210,7 +210,7 @@ class TestUserRepository:
         original_first_name = mock_user.first_name
 
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_user
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -242,7 +242,7 @@ class TestUserRepository:
         user_id = 1
         mock_user = self.create_mock_user(user_id, "test.user")
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_user
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -263,7 +263,7 @@ class TestUserRepository:
         self.mock_session.query.return_value.all.return_value = []
         self.mock_session.query.return_value.filter.return_value.first.return_value = None
         self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Call all methods
@@ -280,7 +280,7 @@ class TestUserRepository:
         assert self.mock_session.query.call_count == 3
         # Also verify that add and commit were called for write operations
         self.mock_session.add.assert_called_once()
-        self.mock_session.commit.assert_called()
+        self.mock_session.flush.assert_called()
 
 
 if __name__ == "__main__":

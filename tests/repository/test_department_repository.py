@@ -111,7 +111,7 @@ class TestDepartmentRepository:
 
         # Mock session.add, commit, refresh
         self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -127,7 +127,7 @@ class TestDepartmentRepository:
                 manager_id=manager_id
             )
             self.mock_session.add.assert_called_once_with(mock_department)
-            self.mock_session.commit.assert_called_once()
+            self.mock_session.flush.assert_called_once()
             self.mock_session.refresh.assert_called_once_with(mock_department)
 
     def test_create_department_with_minimal_params(self):
@@ -138,7 +138,7 @@ class TestDepartmentRepository:
         mock_department = self.create_mock_department(5, name)
 
         self.mock_session.add = Mock()
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -164,7 +164,7 @@ class TestDepartmentRepository:
 
         mock_department = self.create_mock_department(dept_id, "Original Department")
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_department
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -177,7 +177,7 @@ class TestDepartmentRepository:
         assert mock_department.name == updated_name
         assert mock_department.description == updated_description
         assert mock_department.manager_id == updated_manager_id
-        self.mock_session.commit.assert_called_once()
+        self.mock_session.flush.assert_called_once()
         self.mock_session.refresh.assert_called_once_with(mock_department)
 
     def test_update_department_partial_update(self):
@@ -191,7 +191,7 @@ class TestDepartmentRepository:
         original_manager_id = mock_department.manager_id
 
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_department
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -231,7 +231,7 @@ class TestDepartmentRepository:
 
         mock_department = MockDepartment()
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_department
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -242,7 +242,7 @@ class TestDepartmentRepository:
         # When description=None is explicitly passed, the condition "if description is not None" is False
         # So the description is NOT updated and remains at its original value
         assert mock_department.description == "Original description"
-        self.mock_session.commit.assert_called_once()
+        self.mock_session.flush.assert_called_once()
         self.mock_session.refresh.assert_called_once_with(mock_department)
 
     def test_update_department_with_manager_id_none(self):
@@ -251,7 +251,7 @@ class TestDepartmentRepository:
         dept_id = 1
         mock_department = self.create_mock_department(dept_id, "Test Department")
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_department
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
         self.mock_session.refresh = Mock()
 
         # Act
@@ -267,7 +267,7 @@ class TestDepartmentRepository:
         dept_id = 1
         mock_department = self.create_mock_department(dept_id, "Test Department")
         self.mock_session.query.return_value.filter.return_value.first.return_value = mock_department
-        self.mock_session.commit = Mock()
+        self.mock_session.flush = Mock()
 
         # Act
         result = self.repository.delete_department(dept_id)
@@ -275,7 +275,7 @@ class TestDepartmentRepository:
         # Assert
         assert result is True
         assert mock_department.is_active is False
-        self.mock_session.commit.assert_called_once()
+        self.mock_session.flush.assert_called_once()
 
     def test_delete_department_not_found(self):
         """Test delete_department returns False when department not found"""
@@ -337,7 +337,7 @@ class TestDepartmentRepository:
         # add should be called once (create_department)
         self.mock_session.add.assert_called_once()
         # commit should be called for create, update, and delete (3 times)
-        assert self.mock_session.commit.call_count == 3
+        assert self.mock_session.flush.call_count == 3
 
 
 if __name__ == "__main__":

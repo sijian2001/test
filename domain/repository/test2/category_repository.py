@@ -42,7 +42,7 @@ class CategoryRepository:
         """Create a new category"""
         session = self.db_session
         session.add(category)
-        session.commit()
+        session.flush()
         session.refresh(category)
         return category
 
@@ -50,7 +50,7 @@ class CategoryRepository:
         """Update an existing category"""
         session = self.db_session
         session.merge(category)
-        session.commit()
+        session.flush()
         return category
 
     def delete_category(self, category_id: int) -> bool:
@@ -59,6 +59,6 @@ class CategoryRepository:
         category = self.get_category_by_id(category_id)
         if category:
             session.delete(category)
-            session.commit()
+            session.flush()
             return True
         return False

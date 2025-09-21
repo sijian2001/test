@@ -258,7 +258,7 @@ class TestProductRepository:
 
         # Mock session.add, commit, refresh
         self.mock_db_session.add = Mock()
-        self.mock_db_session.commit = Mock()
+        self.mock_db_session.flush = Mock()
         self.mock_db_session.refresh = Mock()
 
         # Act
@@ -267,7 +267,7 @@ class TestProductRepository:
         # Assert
         assert result == mock_product
         self.mock_db_session.add.assert_called_once_with(mock_product)
-        self.mock_db_session.commit.assert_called_once()
+        self.mock_db_session.flush.assert_called_once()
         self.mock_db_session.refresh.assert_called_once_with(mock_product)
 
     def test_update_product_success(self):
@@ -277,7 +277,7 @@ class TestProductRepository:
 
         # Mock session.merge, commit
         self.mock_db_session.merge = Mock(return_value=mock_product)
-        self.mock_db_session.commit = Mock()
+        self.mock_db_session.flush = Mock()
 
         # Act
         result = self.repository.update_product(mock_product)
@@ -285,7 +285,7 @@ class TestProductRepository:
         # Assert
         assert result == mock_product
         self.mock_db_session.merge.assert_called_once_with(mock_product)
-        self.mock_db_session.commit.assert_called_once()
+        self.mock_db_session.flush.assert_called_once()
 
     def test_update_stock_quantity_success(self):
         """Test update_stock_quantity updates stock successfully"""
@@ -296,7 +296,7 @@ class TestProductRepository:
 
         # Mock get_product_by_id to return the product
         with patch.object(self.repository, 'get_product_by_id', return_value=mock_product):
-            self.mock_db_session.commit = Mock()
+            self.mock_db_session.flush = Mock()
 
             # Act
             result = self.repository.update_stock_quantity(product_id, new_quantity)
@@ -304,7 +304,7 @@ class TestProductRepository:
             # Assert
             assert result is True
             assert mock_product.stock_quantity == new_quantity
-            self.mock_db_session.commit.assert_called_once()
+            self.mock_db_session.flush.assert_called_once()
 
     def test_update_stock_quantity_product_not_found(self):
         """Test update_stock_quantity returns False when product not found"""
@@ -329,7 +329,7 @@ class TestProductRepository:
         # Mock get_product_by_id to return the product
         with patch.object(self.repository, 'get_product_by_id', return_value=mock_product):
             self.mock_db_session.delete = Mock()
-            self.mock_db_session.commit = Mock()
+            self.mock_db_session.flush = Mock()
 
             # Act
             result = self.repository.delete_product(product_id)
@@ -337,7 +337,7 @@ class TestProductRepository:
             # Assert
             assert result is True
             self.mock_db_session.delete.assert_called_once_with(mock_product)
-            self.mock_db_session.commit.assert_called_once()
+            self.mock_db_session.flush.assert_called_once()
 
     def test_delete_product_not_found(self):
         """Test delete_product returns False when product not found"""
@@ -364,7 +364,7 @@ class TestProductRepository:
         self.mock_db_session.query.return_value.filter.return_value.first.return_value = None
         self.mock_db_session.query.return_value.filter.return_value.all.return_value = []
         self.mock_db_session.add = Mock()
-        self.mock_db_session.commit = Mock()
+        self.mock_db_session.flush = Mock()
         self.mock_db_session.refresh = Mock()
         self.mock_db_session.merge = Mock()
         self.mock_db_session.delete = Mock()
@@ -392,7 +392,7 @@ class TestProductRepository:
         assert self.mock_db_session.query.call_count >= 8  # At least 8 read operations
         # Add, commit should be called for write operations
         self.mock_db_session.add.assert_called()
-        self.mock_db_session.commit.assert_called()
+        self.mock_db_session.flush.assert_called()
 
 
 if __name__ == "__main__":

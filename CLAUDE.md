@@ -95,9 +95,9 @@ python product_info_export_main.py # 商品情報をCSVエクスポート
 
 1. タスクの状態を「着手中」に変更
 2. タスクの開始日時を設定 (時間まで記載すること)
-3. Git で main からブランチを作成 (ブランチ名は`feature/<タスクID>`とする)
+3. Git で develop からブランチを作成 (ブランチ名は`feature/<タスクID>`とする)
 4. 空コミットを作成 (コミットメッセージは`chore: start feature/<タスクID>`とする)
-5. PR を作成 (`gh pr create --assignee @me --base main --draft`)
+5. PR を作成 (`gh pr create --assignee @me --base develop --draft`)
   - タイトルはタスクのタイトルを参照する (`【<タスクID>】<タイトル>`)
   - ボディはタスクの内容から生成する (Notion タスクへのリンクを含める)
 6. 実装計画を考えて、ユーザーに伝える

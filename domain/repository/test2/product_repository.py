@@ -62,7 +62,7 @@ class ProductRepository:
         """Create a new product"""
         session = self.db_session
         session.add(product)
-        session.commit()
+        session.flush()
         session.refresh(product)
         return product
 
@@ -70,7 +70,7 @@ class ProductRepository:
         """Update an existing product"""
         session = self.db_session
         session.merge(product)
-        session.commit()
+        session.flush()
         return product
 
     def update_stock_quantity(self, product_id: int, new_quantity: int) -> bool:
@@ -79,7 +79,7 @@ class ProductRepository:
         product = self.get_product_by_id(product_id)
         if product:
             product.stock_quantity = new_quantity
-            session.commit()
+            session.flush()
             return True
         return False
 
@@ -89,6 +89,6 @@ class ProductRepository:
         product = self.get_product_by_id(product_id)
         if product:
             session.delete(product)
-            session.commit()
+            session.flush()
             return True
         return False
