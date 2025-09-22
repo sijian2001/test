@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import logging
 from typing import List
 from business.product_regist_service import ProductRegistService, ProductRegistInDto
-from domain.vo.product_vo import ProductVo
+from business.vo.product_vo import ProductVo
 
 logging.basicConfig(level=logging.INFO)
 

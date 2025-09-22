@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from business.user_regist_service import UserRegistService, UserRegistInDto, UserRegistOutDto
 from domain.repository.test1.user_repository import UserRepository
 from domain.model.test1.user import User
-from domain.vo.user_vo import UserVo
+from business.vo.user_vo import UserVo
 
 
 class TestUserRegistService:

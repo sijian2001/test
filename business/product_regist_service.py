@@ -6,7 +6,7 @@ import logging
 from business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
 from domain.repository.test2.product_repository import ProductRepository
 from domain.model.test2.product import Product
-from domain.vo.product_vo import ProductVo
+from business.vo.product_vo import ProductVo
 
 logging.basicConfig(level=logging.INFO)
 

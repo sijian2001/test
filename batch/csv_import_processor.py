@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 from injector import inject
 import logging
 from business.depart_user_regist_service import DepartUserRegistService, DepartUserRegistInDto
-from domain.vo.department_vo import DepartmentVo
-from domain.vo.user_vo import UserVo
+from business.vo.department_vo import DepartmentVo
+from business.vo.user_vo import UserVo
 
 logging.basicConfig(level=logging.INFO)
 

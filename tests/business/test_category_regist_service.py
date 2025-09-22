@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from business.category_regist_service import CategoryRegistService, CategoryRegistInDto, CategoryRegistOutDto
 from domain.repository.test2.category_repository import CategoryRepository
 from domain.model.test2.category import Category
-from domain.vo.category_vo import CategoryVo
+from business.vo.category_vo import CategoryVo
 
 
 class TestCategoryRegistService:

@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from batch.products_csv_import_processor import ProductsCsvImportProcessorImpl
 from business.product_regist_service import ProductRegistService, ProductRegistInDto, ProductRegistOutDto
-from domain.vo.product_vo import ProductVo
+from business.vo.product_vo import ProductVo
 
 
 class TestProductsCsvImportProcessorImpl:

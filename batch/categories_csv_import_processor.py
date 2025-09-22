@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from injector import inject
 
 from business.category_regist_service import CategoryRegistService, CategoryRegistInDto
-from domain.vo.category_vo import CategoryVo
+from business.vo.category_vo import CategoryVo
 
 logging.basicConfig(level=logging.INFO)
 

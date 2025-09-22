@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from business.department_regist_service import DepartmentRegistService, DepartmentRegistInDto, DepartmentRegistOutDto
 from domain.repository.test1.department_repository import DepartmentRepository
 from domain.model.test1.department import Department
-from domain.vo.department_vo import DepartmentVo
+from business.vo.department_vo import DepartmentVo
 
 
 class TestDepartmentRegistService:

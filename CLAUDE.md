@@ -77,9 +77,9 @@ python product_info_export_main.py # 商品情報をCSVエクスポート
 コードベースは従来の`DatabaseSession.get_session(database)`パターンから直接`Test1DatabaseSession`/`Test2DatabaseSession`インジェクションへ移行中です。変更時は新しいセッションクラスを使用してください。
 
 ### バリューオブジェクト
-ドメインモデルは`domain/vo/`にバリューオブジェクトとして実装:
-- `user_vo.py`, `product_vo.py`, `category_vo.py`など
-- 層間でのデータ転送に使用
+データ転送用のバリューオブジェクトは`business/vo/`に配置:
+- `user_vo.py`, `product_vo.py`, `category_vo.py`, `department_vo.py`
+- サービス層とバッチ層間でのデータ転送に使用
 
 ### 主要設定
 - `db.yaml`: test1/test2のデータベース接続文字列

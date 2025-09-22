@@ -9,8 +9,8 @@ from business.department_regist_service import DepartmentRegistService, Departme
 from business.user_regist_service import UserRegistService, UserRegistInDto
 from business.decorators.session_manager import SessionManager
 from domain.database import DatabaseSession
-from domain.vo.department_vo import DepartmentVo
-from domain.vo.user_vo import UserVo
+from business.vo.department_vo import DepartmentVo
+from business.vo.user_vo import UserVo
 
 logging.basicConfig(level=logging.INFO)
 

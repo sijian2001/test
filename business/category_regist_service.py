@@ -6,7 +6,7 @@ import logging
 from business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
 from domain.repository.test2.category_repository import CategoryRepository
 from domain.model.test2.category import Category
-from domain.vo.category_vo import CategoryVo
+from business.vo.category_vo import CategoryVo
 
 logging.basicConfig(level=logging.INFO)
 
