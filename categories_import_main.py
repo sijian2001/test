@@ -4,6 +4,7 @@ import sys
 import logging
 from injector import Injector
 from batch.categories_csv_import_processor import CategoriesCsvImportProcessorImpl
+from utils.logger_utils import setup_application_logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,6 +13,9 @@ def main():
     """Main function for Categories CSV Import"""
     try:
         logger.info("Starting Categories CSV Import Application...")
+
+        # Setup application logging (Injector and SQLAlchemy)
+        setup_application_logging()
 
         # Create injector and get processor
         injector = Injector()

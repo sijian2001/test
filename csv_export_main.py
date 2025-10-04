@@ -4,12 +4,16 @@ import sys
 import logging
 from injector import Injector
 from batch.csv_export_processor import UserInfoCsvExportProcessor
+from utils.logger_utils import setup_application_logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def main():
     logger.info("Starting CSV Export Application...")
+
+    # Setup application logging (Injector and SQLAlchemy)
+    setup_application_logging()
 
     injector = Injector()
 

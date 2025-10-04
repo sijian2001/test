@@ -11,13 +11,14 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from product_info_export_main import (
+from utils.logger_utils import (
     load_logger_config,
     _create_logger_handler,
     _get_logger_config_value,
     _setup_logger,
     setup_injector_logging,
-    setup_sqlalchemy_logging
+    setup_sqlalchemy_logging,
+    setup_application_logging
 )
 
 
@@ -181,7 +182,7 @@ class TestSetupInjectorLogging:
 
     def test_setup_injector_logging_without_config(self):
         """Test setup without config (uses defaults)"""
-        with patch('product_info_export_main.load_logger_config', return_value=None):
+        with patch('utils.logger_utils.load_logger_config', return_value=None):
             setup_injector_logging()
 
             injector_logger = logging.getLogger('injector')
@@ -233,9 +234,60 @@ class TestSetupSQLAlchemyLogging:
 
     def test_setup_sqlalchemy_logging_without_config(self):
         """Test setup without config (uses defaults)"""
-        with patch('product_info_export_main.load_logger_config', return_value=None):
+        with patch('utils.logger_utils.load_logger_config', return_value=None):
             setup_sqlalchemy_logging()
 
             engine_logger = logging.getLogger('sqlalchemy.engine')
             assert engine_logger.level == logging.INFO
             assert len(engine_logger.handlers) > 0
+
+
+class TestSetupApplicationLogging:
+    """Tests for setup_application_logging function"""
+
+    def setup_method(self):
+        """Clear logger handlers before each test"""
+        for logger_name in ['injector', 'sqlalchemy.engine', 'sqlalchemy.pool',
+                           'sqlalchemy.dialects', 'sqlalchemy.orm']:
+            test_logger = logging.getLogger(logger_name)
+            test_logger.handlers.clear()
+
+    def test_setup_application_logging_no_env_vars(self):
+        """Test setup without environment variables"""
+        with patch.dict(os.environ, {}, clear=True):
+            with patch('utils.logger_utils.load_logger_config', return_value=None):
+                setup_application_logging()
+
+                # No loggers should be set up
+                injector_logger = logging.getLogger('injector')
+                assert len(injector_logger.handlers) == 0
+
+    def test_setup_application_logging_with_debug_injector(self):
+        """Test setup with DEBUG_INJECTOR=true"""
+        with patch.dict(os.environ, {'DEBUG_INJECTOR': 'true'}):
+            with patch('utils.logger_utils.load_logger_config', return_value=None):
+                setup_application_logging()
+
+                injector_logger = logging.getLogger('injector')
+                assert len(injector_logger.handlers) > 0
+
+    def test_setup_application_logging_with_debug_sql(self):
+        """Test setup with DEBUG_SQL=true"""
+        with patch.dict(os.environ, {'DEBUG_SQL': 'true'}):
+            with patch('utils.logger_utils.load_logger_config', return_value=None):
+                setup_application_logging()
+
+                engine_logger = logging.getLogger('sqlalchemy.engine')
+                assert len(engine_logger.handlers) > 0
+
+    def test_setup_application_logging_with_both_env_vars(self):
+        """Test setup with both environment variables"""
+        with patch.dict(os.environ, {'DEBUG_INJECTOR': 'true', 'DEBUG_SQL': 'true'}):
+            with patch('utils.logger_utils.load_logger_config', return_value=None):
+                setup_application_logging()
+
+                injector_logger = logging.getLogger('injector')
+                engine_logger = logging.getLogger('sqlalchemy.engine')
+
+                assert len(injector_logger.handlers) > 0
+                assert len(engine_logger.handlers) > 0
