@@ -3,12 +3,11 @@ from dataclasses import dataclass
 from typing import List
 from injector import inject
 import logging
-from sqlalchemy.orm import Session
 from business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
 from business.department_regist_service import DepartmentRegistService, DepartmentRegistInDto
 from business.user_regist_service import UserRegistService, UserRegistInDto
 from business.decorators.session_manager import SessionManager
-from domain.database import DatabaseSession
+from business.decorators.database_enum import Database
 from business.vo.department_vo import DepartmentVo
 from business.vo.user_vo import UserVo
 
@@ -38,7 +37,6 @@ class AbstractDepartUserRegistService(AbstractService):
 class DepartUserRegistService(AbstractDepartUserRegistService):
     department_regist_service: DepartmentRegistService
     user_regist_service: UserRegistService
-    db_session: DatabaseSession
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)
@@ -46,8 +44,8 @@ class DepartUserRegistService(AbstractDepartUserRegistService):
     def execute(self, in_dto: DepartUserRegistInDto) -> DepartUserRegistOutDto:
         return self.regist_depart_user(in_dto)
     
-    @SessionManager
-    def regist_depart_user(self, session: Session, input_dto: DepartUserRegistInDto) -> DepartUserRegistOutDto:
+    @SessionManager(database=Database.TEST1)
+    def regist_depart_user(self, input_dto: DepartUserRegistInDto) -> DepartUserRegistOutDto:
         self.logger.info("=== Starting Department and User Registration ===")
         
         # 1. Department registration

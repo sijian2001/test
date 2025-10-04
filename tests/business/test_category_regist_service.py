@@ -11,6 +11,7 @@ from business.category_regist_service import CategoryRegistService, CategoryRegi
 from domain.repository.test2.category_repository import CategoryRepository
 from domain.model.test2.category import Category
 from business.vo.category_vo import CategoryVo
+from domain.session_holder import SessionHolder
 
 
 class TestCategoryRegistService:
@@ -18,11 +19,22 @@ class TestCategoryRegistService:
 
     def setup_method(self):
         """Setup method called before each test"""
+        # SessionHolderをクリア
+        SessionHolder.clear()
+
+        # モックセッションを登録
+        mock_session = Mock()
+        SessionHolder.register('test2', lambda: mock_session)
+
         # Create a mock CategoryRepository
         self.mock_repository = Mock(spec=CategoryRepository)
 
         # Create CategoryRegistService instance with mocked dependencies
         self.service = CategoryRegistService(category_repository=self.mock_repository)
+
+    def teardown_method(self):
+        """Teardown method called after each test"""
+        SessionHolder.clear()
 
     def create_category_vo(self, category_name: str, category_description: str = None, parent_category_id: int = None) -> CategoryVo:
         """Helper method to create CategoryVo objects"""
