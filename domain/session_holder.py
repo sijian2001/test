@@ -4,10 +4,7 @@ from sqlalchemy.orm import Session
 
 class SessionHolder:
     """
-    セッションファクトリーを一元管理するシングルトンクラス
-
-    データベースごとのセッション生成ロジックを登録し、
-    SessionManagerなどから統一的にアクセスできるようにする
+    Singleton class for centralized session factory management
 
     This class provides centralized session factory management.
     Each database registers its session factory, which can then be
@@ -27,8 +24,6 @@ class SessionHolder:
     @classmethod
     def register(cls, database: str, session_factory: Callable[[], Session]) -> None:
         """
-        セッションファクトリーを登録
-
         Register a session factory for a specific database
 
         Args:
@@ -47,8 +42,6 @@ class SessionHolder:
     @classmethod
     def get_session(cls, database: str) -> Session:
         """
-        指定されたデータベースのセッションを取得
-
         Get a session for the specified database
 
         Args:
@@ -70,8 +63,6 @@ class SessionHolder:
     @classmethod
     def is_registered(cls, database: str) -> bool:
         """
-        指定されたデータベースが登録されているかチェック
-
         Check if a database is registered
 
         Args:
@@ -85,8 +76,6 @@ class SessionHolder:
     @classmethod
     def clear(cls) -> None:
         """
-        全ての登録をクリア（主にテスト用）
-
         Clear all registered session factories (mainly for testing)
         """
         cls._session_factories.clear()
@@ -94,8 +83,6 @@ class SessionHolder:
     @classmethod
     def get_registered_databases(cls) -> list:
         """
-        登録されているデータベース一覧を取得
-
         Get list of registered databases
 
         Returns:

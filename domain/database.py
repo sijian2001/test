@@ -108,7 +108,7 @@ class Test1DatabaseSession(Session):
         self._register_to_session_holder()
 
     def _register_to_session_holder(self):
-        """SessionHolderにセッションファクトリーを登録"""
+        """Register session factory to SessionHolder"""
         if not SessionHolder.is_registered('test1'):
             session_factory = sessionmaker(bind=self.engine.get_engine())
             SessionHolder.register('test1', session_factory)
@@ -139,7 +139,7 @@ class Test2DatabaseSession(Session):
         self._register_to_session_holder()
 
     def _register_to_session_holder(self):
-        """SessionHolderにセッションファクトリーを登録"""
+        """Register session factory to SessionHolder"""
         if not SessionHolder.is_registered('test2'):
             session_factory = sessionmaker(bind=self.engine.get_engine())
             SessionHolder.register('test2', session_factory)

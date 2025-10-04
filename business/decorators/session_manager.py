@@ -10,12 +10,16 @@ logger = logging.getLogger(__name__)
 
 class SessionManager:
     """
-    セッション管理を行うデコレーター
-    メソッドの実行前にセッションを開始し、正常終了時はコミット、エラー時はロールバック、
-    最終的にセッションをクローズする
+    Decorator for automatic session and transaction management
 
     This decorator provides automatic transaction management for service methods.
     It eliminates the need for manual session handling in business logic.
+
+    The decorator automatically:
+    - Starts a session before method execution
+    - Commits the transaction on successful completion
+    - Rolls back the transaction on error
+    - Closes the session in all cases
 
     Usage:
         @SessionManager(database=Database.TEST1)
@@ -82,29 +86,29 @@ class SessionManager:
         @functools.wraps(func)
         def wrapper(instance: Any, *args, **kwargs) -> Any:
             """
-            デコレートされたメソッドを実行し、セッション管理を行う
+            Execute the decorated method with session management
 
             Args:
-                instance: デコレートされたメソッドを持つインスタンス
-                *args: メソッドの引数
-                **kwargs: メソッドのキーワード引数
+                instance: Instance that owns the decorated method
+                *args: Method arguments
+                **kwargs: Method keyword arguments
 
             Returns:
-                メソッドの実行結果
+                Method execution result
             """
             session = None
             try:
-                # SessionHolderからセッションを取得
+                # Get session from SessionHolder
                 session = SessionHolder.get_session(self.database.value)
                 session.begin()
                 logger.info(
                     f"Session started for {self.database.value} and transaction began"
                 )
 
-                # デコレートされたメソッドを実行（sessionを渡さない）
+                # Execute the decorated method
                 result = func(instance, *args, **kwargs)
 
-                # 正常終了時はコミット
+                # Commit on success
                 session.commit()
                 logger.info(
                     f"Transaction committed successfully for {self.database.value}"
@@ -112,7 +116,7 @@ class SessionManager:
                 return result
 
             except Exception as e:
-                # エラー発生時はロールバック
+                # Rollback on error
                 if session:
                     session.rollback()
                     logger.error(
@@ -121,7 +125,7 @@ class SessionManager:
                 logger.error(f"Error in {func.__name__}: {str(e)}")
                 raise
             finally:
-                # セッションをクローズ
+                # Close session
                 if session:
                     session.close()
                     logger.info(f"Session closed for {self.database.value}")
