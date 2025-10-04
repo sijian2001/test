@@ -7,6 +7,7 @@ from business.abstract_service import AbstractService, AbstractInDto, AbstractOu
 from business.department_regist_service import DepartmentRegistService, DepartmentRegistInDto
 from business.user_regist_service import UserRegistService, UserRegistInDto
 from business.decorators.session_manager import SessionManager
+from business.decorators.database_enum import Database
 from domain.database import DatabaseSession
 from business.vo.department_vo import DepartmentVo
 from business.vo.user_vo import UserVo
@@ -45,7 +46,7 @@ class DepartUserRegistService(AbstractDepartUserRegistService):
     def execute(self, in_dto: DepartUserRegistInDto) -> DepartUserRegistOutDto:
         return self.regist_depart_user(in_dto)
     
-    @SessionManager(database='test1')
+    @SessionManager(database=Database.TEST1)
     def regist_depart_user(self, input_dto: DepartUserRegistInDto) -> DepartUserRegistOutDto:
         self.logger.info("=== Starting Department and User Registration ===")
         
