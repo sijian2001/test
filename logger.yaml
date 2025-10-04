@@ -13,6 +13,7 @@ logger:
   # SQLAlchemy logger configuration
   sqlalchemy:
     enabled: false  # Set to true or use DEBUG_SQL=true environment variable
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     # Engine logger: outputs SQL statements
     engine:
       level: INFO  # INFO: SQL statements only, DEBUG: SQL + result sets

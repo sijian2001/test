@@ -80,11 +80,13 @@ def setup_sqlalchemy_logging(config=None):
 
     if config and 'logger' in config and 'sqlalchemy' in config['logger']:
         sqlalchemy_config = config['logger']['sqlalchemy']
+        log_format = sqlalchemy_config.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         engine_level = getattr(logging, sqlalchemy_config.get('engine', {}).get('level', 'INFO'))
         pool_level = getattr(logging, sqlalchemy_config.get('pool', {}).get('level', 'DEBUG'))
         dialects_level = getattr(logging, sqlalchemy_config.get('dialects', {}).get('level', 'DEBUG'))
         orm_level = getattr(logging, sqlalchemy_config.get('orm', {}).get('level', 'DEBUG'))
     else:
+        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         engine_level = logging.INFO
         pool_level = logging.DEBUG
         dialects_level = logging.DEBUG
@@ -96,7 +98,7 @@ def setup_sqlalchemy_logging(config=None):
         engine_logger.setLevel(engine_level)
         handler = logging.StreamHandler()
         handler.setLevel(engine_level)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(log_format)
         handler.setFormatter(formatter)
         engine_logger.addHandler(handler)
 
@@ -106,7 +108,7 @@ def setup_sqlalchemy_logging(config=None):
         pool_logger.setLevel(pool_level)
         handler = logging.StreamHandler()
         handler.setLevel(pool_level)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(log_format)
         handler.setFormatter(formatter)
         pool_logger.addHandler(handler)
 
