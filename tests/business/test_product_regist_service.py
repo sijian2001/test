@@ -11,6 +11,7 @@ from business.product_regist_service import ProductRegistService, ProductRegistI
 from domain.repository.test2.product_repository import ProductRepository
 from domain.model.test2.product import Product
 from business.vo.product_vo import ProductVo
+from domain.session_holder import SessionHolder
 
 
 class TestProductRegistService:
@@ -18,11 +19,22 @@ class TestProductRegistService:
 
     def setup_method(self):
         """Setup method called before each test"""
+        # SessionHolderをクリア
+        SessionHolder.clear()
+
+        # モックセッションを登録
+        mock_session = Mock()
+        SessionHolder.register('test2', lambda: mock_session)
+
         # Create a mock ProductRepository
         self.mock_repository = Mock(spec=ProductRepository)
 
         # Create ProductRegistService instance with mocked dependencies
         self.service = ProductRegistService(product_repository=self.mock_repository)
+
+    def teardown_method(self):
+        """Teardown method called after each test"""
+        SessionHolder.clear()
 
     def create_product_vo(self, product_name: str, description: str = None, price: float = 99.99,
                          stock_quantity: int = 10, category_id: int = 1) -> ProductVo:

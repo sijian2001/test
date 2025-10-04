@@ -4,6 +4,8 @@ from typing import List
 from injector import inject
 import logging
 from business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
+from business.decorators.session_manager import SessionManager
+from business.decorators.database_enum import Database
 from domain.repository.test2.product_repository import ProductRepository
 from domain.model.test2.product import Product
 from business.vo.product_vo import ProductVo
@@ -31,6 +33,7 @@ class ProductRegistService(AbstractProductRegistService):
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)
 
+    @SessionManager(database=Database.TEST2)
     def execute(self, in_dto: ProductRegistInDto) -> ProductRegistOutDto:
         self.logger.info("=== Starting Product Registration ===")
 
