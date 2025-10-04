@@ -8,7 +8,6 @@ from business.department_regist_service import DepartmentRegistService, Departme
 from business.user_regist_service import UserRegistService, UserRegistInDto
 from business.decorators.session_manager import SessionManager
 from business.decorators.database_enum import Database
-from domain.database import DatabaseSession
 from business.vo.department_vo import DepartmentVo
 from business.vo.user_vo import UserVo
 
@@ -38,7 +37,6 @@ class AbstractDepartUserRegistService(AbstractService):
 class DepartUserRegistService(AbstractDepartUserRegistService):
     department_regist_service: DepartmentRegistService
     user_regist_service: UserRegistService
-    db_session: DatabaseSession
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)

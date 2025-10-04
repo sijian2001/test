@@ -2,17 +2,28 @@ import pytest
 from unittest.mock import Mock, MagicMock, patch
 from business.decorators.session_manager import SessionManager
 from business.decorators.database_enum import Database
+from domain.session_holder import SessionHolder
 
 
 class TestSessionManager:
     """SessionManagerデコレーターの単体テスト"""
+
+    def setup_method(self):
+        """各テストの前にSessionHolderをクリア"""
+        SessionHolder.clear()
+
+    def teardown_method(self):
+        """各テストの後にSessionHolderをクリア"""
+        SessionHolder.clear()
 
     def test_session_manager_with_enum_test1(self):
         """TEST1 Enumを使用した正常系テスト"""
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test1', lambda: mock_session)
 
         @SessionManager(database=Database.TEST1)
         def dummy_method(self):
@@ -23,7 +34,6 @@ class TestSessionManager:
 
         # Assert
         assert result == "success"
-        mock_instance.db_session.get_session.assert_called_once_with('test1')
         mock_session.begin.assert_called_once()
         mock_session.commit.assert_called_once()
         mock_session.close.assert_called_once()
@@ -33,7 +43,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test2', lambda: mock_session)
 
         @SessionManager(database=Database.TEST2)
         def dummy_method(self):
@@ -44,7 +56,6 @@ class TestSessionManager:
 
         # Assert
         assert result == "success"
-        mock_instance.db_session.get_session.assert_called_once_with('test2')
         mock_session.begin.assert_called_once()
         mock_session.commit.assert_called_once()
         mock_session.close.assert_called_once()
@@ -54,7 +65,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test1', lambda: mock_session)
 
         @SessionManager(database='test1')
         def dummy_method(self):
@@ -65,7 +78,6 @@ class TestSessionManager:
 
         # Assert
         assert result == "success"
-        mock_instance.db_session.get_session.assert_called_once_with('test1')
         mock_session.begin.assert_called_once()
         mock_session.commit.assert_called_once()
         mock_session.close.assert_called_once()
@@ -75,7 +87,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test2', lambda: mock_session)
 
         @SessionManager(database='test2')
         def dummy_method(self):
@@ -86,7 +100,9 @@ class TestSessionManager:
 
         # Assert
         assert result == "success"
-        mock_instance.db_session.get_session.assert_called_once_with('test2')
+        mock_session.begin.assert_called_once()
+        mock_session.commit.assert_called_once()
+        mock_session.close.assert_called_once()
 
     def test_session_manager_invalid_string_database(self):
         """無効な文字列データベース名のテスト"""
@@ -109,7 +125,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test1', lambda: mock_session)
 
         @SessionManager(database=Database.TEST1)
         def dummy_method(self):
@@ -129,7 +147,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test1', lambda: mock_session)
 
         @SessionManager(database=Database.TEST1)
         def dummy_method(self):
@@ -149,7 +169,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test2', lambda: mock_session)
 
         @SessionManager(database=Database.TEST2)
         def dummy_method(self):
@@ -169,7 +191,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test1', lambda: mock_session)
 
         @SessionManager(database=Database.TEST1)
         def dummy_method(self):
@@ -188,7 +212,9 @@ class TestSessionManager:
         # Arrange
         mock_instance = Mock()
         mock_session = Mock()
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test1', lambda: mock_session)
 
         @SessionManager(database=Database.TEST1)
         def dummy_method(self, arg1, arg2, kwarg1=None, kwarg2=None):
@@ -220,7 +246,9 @@ class TestSessionManager:
         mock_instance = Mock()
         mock_session = Mock()
         mock_session.commit.side_effect = RuntimeError("Commit failed")
-        mock_instance.db_session.get_session.return_value = mock_session
+
+        # SessionHolderにモックセッションファクトリーを登録
+        SessionHolder.register('test1', lambda: mock_session)
 
         @SessionManager(database=Database.TEST1)
         def dummy_method(self):

@@ -3,6 +3,7 @@ import logging
 from typing import Callable, Any, Union
 from sqlalchemy.orm import Session
 from business.decorators.database_enum import Database
+from domain.session_holder import SessionHolder
 
 logger = logging.getLogger(__name__)
 
@@ -93,8 +94,8 @@ class SessionManager:
             """
             session = None
             try:
-                # データベース別にセッションを取得
-                session = instance.db_session.get_session(self.database.value)
+                # SessionHolderからセッションを取得
+                session = SessionHolder.get_session(self.database.value)
                 session.begin()
                 logger.info(
                     f"Session started for {self.database.value} and transaction began"
