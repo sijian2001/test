@@ -10,18 +10,61 @@ from batch.product_info_csv_export_processor import ProductInfoCsvExportProcesso
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Logger configuration file path
+LOGGER_CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'logger.yaml')
+
+# Default log format
+DEFAULT_LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
 
 def load_logger_config():
     """Load logger configuration from logger.yaml"""
     try:
-        with open('logger.yaml', 'r', encoding='utf-8') as f:
+        with open(LOGGER_CONFIG_FILE, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
         logger.warning("logger.yaml not found, using default configuration")
         return None
-    except Exception as e:
-        logger.error(f"Failed to load logger.yaml: {e}")
+    except yaml.YAMLError as e:
+        logger.error(f"Failed to parse logger.yaml: {e}")
         return None
+    except Exception as e:
+        logger.error(f"Unexpected error loading logger.yaml: {e}")
+        return None
+
+
+def _create_logger_handler(level, log_format):
+    """Create and configure a StreamHandler with the given level and format"""
+    handler = logging.StreamHandler()
+    handler.setLevel(level)
+    formatter = logging.Formatter(log_format)
+    handler.setFormatter(formatter)
+    return handler
+
+
+def _get_logger_config_value(config, logger_name, key, default):
+    """Get configuration value from logger config with fallback to default"""
+    if config and 'logger' in config and logger_name in config['logger']:
+        logger_config = config['logger'][logger_name]
+        if key == 'level':
+            level_str = logger_config.get(key, default if isinstance(default, str) else 'DEBUG')
+            return getattr(logging, level_str) if isinstance(level_str, str) else default
+        return logger_config.get(key, default)
+    return default
+
+
+def _setup_logger(logger_name, level, log_format, already_enabled_msg=None):
+    """Setup a logger with the given name, level, and format"""
+    target_logger = logging.getLogger(logger_name)
+
+    # Avoid duplicate handlers
+    if target_logger.handlers:
+        if already_enabled_msg:
+            logger.info(already_enabled_msg)
+        return
+
+    target_logger.setLevel(level)
+    target_logger.addHandler(_create_logger_handler(level, log_format))
 
 
 def setup_injector_logging(config=None):
@@ -38,29 +81,10 @@ def setup_injector_logging(config=None):
     if config is None:
         config = load_logger_config()
 
-    if config and 'logger' in config and 'injector' in config['logger']:
-        injector_config = config['logger']['injector']
-        log_level = getattr(logging, injector_config.get('level', 'DEBUG'))
-        log_format = injector_config.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    else:
-        log_level = logging.DEBUG
-        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    log_level = _get_logger_config_value(config, 'injector', 'level', logging.DEBUG)
+    log_format = _get_logger_config_value(config, 'injector', 'format', DEFAULT_LOG_FORMAT)
 
-    injector_logger = logging.getLogger('injector')
-
-    # Avoid duplicate handlers
-    if injector_logger.handlers:
-        logger.info("Injector debug logging already enabled")
-        return
-
-    injector_logger.setLevel(log_level)
-
-    handler = logging.StreamHandler()
-    handler.setLevel(log_level)
-    formatter = logging.Formatter(log_format)
-    handler.setFormatter(formatter)
-    injector_logger.addHandler(handler)
-
+    _setup_logger('injector', log_level, log_format, "Injector debug logging already enabled")
     logger.info("Injector debug logging enabled")
 
 
@@ -78,39 +102,27 @@ def setup_sqlalchemy_logging(config=None):
     if config is None:
         config = load_logger_config()
 
+    # Get common format
+    log_format = _get_logger_config_value(config, 'sqlalchemy', 'format', DEFAULT_LOG_FORMAT)
+
+    # Get log levels for each component
     if config and 'logger' in config and 'sqlalchemy' in config['logger']:
         sqlalchemy_config = config['logger']['sqlalchemy']
-        log_format = sqlalchemy_config.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         engine_level = getattr(logging, sqlalchemy_config.get('engine', {}).get('level', 'INFO'))
         pool_level = getattr(logging, sqlalchemy_config.get('pool', {}).get('level', 'DEBUG'))
         dialects_level = getattr(logging, sqlalchemy_config.get('dialects', {}).get('level', 'DEBUG'))
         orm_level = getattr(logging, sqlalchemy_config.get('orm', {}).get('level', 'DEBUG'))
     else:
-        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         engine_level = logging.INFO
         pool_level = logging.DEBUG
         dialects_level = logging.DEBUG
         orm_level = logging.DEBUG
 
-    # Setup SQLAlchemy engine logger (SQL statements)
-    engine_logger = logging.getLogger('sqlalchemy.engine')
-    if not engine_logger.handlers:
-        engine_logger.setLevel(engine_level)
-        handler = logging.StreamHandler()
-        handler.setLevel(engine_level)
-        formatter = logging.Formatter(log_format)
-        handler.setFormatter(formatter)
-        engine_logger.addHandler(handler)
-
-    # Setup SQLAlchemy pool logger (connection pool)
-    pool_logger = logging.getLogger('sqlalchemy.pool')
-    if not pool_logger.handlers:
-        pool_logger.setLevel(pool_level)
-        handler = logging.StreamHandler()
-        handler.setLevel(pool_level)
-        formatter = logging.Formatter(log_format)
-        handler.setFormatter(formatter)
-        pool_logger.addHandler(handler)
+    # Setup SQLAlchemy loggers
+    _setup_logger('sqlalchemy.engine', engine_level, log_format)
+    _setup_logger('sqlalchemy.pool', pool_level, log_format)
+    _setup_logger('sqlalchemy.dialects', dialects_level, log_format)
+    _setup_logger('sqlalchemy.orm', orm_level, log_format)
 
     logger.info("SQLAlchemy debug logging enabled")
 

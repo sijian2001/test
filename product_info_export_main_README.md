@@ -20,18 +20,27 @@ logger:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
   # Injector logger configuration
+  # Enable with DEBUG_INJECTOR=true environment variable
   injector:
-    enabled: false  # Set to true or use DEBUG_INJECTOR=true
     level: DEBUG
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
   # SQLAlchemy logger configuration
+  # Enable with DEBUG_SQL=true environment variable
   sqlalchemy:
-    enabled: false  # Set to true or use DEBUG_SQL=true
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    # Engine logger: outputs SQL statements
     engine:
-      level: INFO  # SQL statements
+      level: INFO  # INFO: SQL statements only, DEBUG: SQL + result sets
+    # Pool logger: outputs connection pool events
     pool:
-      level: DEBUG  # Connection pool events
+      level: DEBUG
+    # Dialects logger: outputs SQL dialect details
+    dialects:
+      level: DEBUG
+    # ORM logger: outputs ORM internal operations
+    orm:
+      level: DEBUG
 ```
 
 ## Usage
