@@ -4,6 +4,7 @@ Logger utilities for setting up application logging
 import logging
 import os
 import yaml
+from logging.handlers import RotatingFileHandler
 
 # Logger configuration file path
 LOGGER_CONFIG_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logger.yaml')
@@ -34,6 +35,25 @@ def load_logger_config():
 def _create_logger_handler(level, log_format):
     """Create and configure a StreamHandler with the given level and format"""
     handler = logging.StreamHandler()
+    handler.setLevel(level)
+    formatter = logging.Formatter(log_format)
+    handler.setFormatter(formatter)
+    return handler
+
+
+def _create_file_handler(file_path, level, log_format, max_bytes, backup_count):
+    """Create and configure a RotatingFileHandler with the given parameters"""
+    # Ensure directory exists
+    log_dir = os.path.dirname(file_path)
+    if log_dir and not os.path.exists(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
+
+    handler = RotatingFileHandler(
+        file_path,
+        maxBytes=max_bytes,
+        backupCount=backup_count,
+        encoding='utf-8'
+    )
     handler.setLevel(level)
     formatter = logging.Formatter(log_format)
     handler.setFormatter(formatter)
@@ -125,6 +145,49 @@ def setup_sqlalchemy_logging(config=None):
     logger.info("SQLAlchemy debug logging enabled")
 
 
+def setup_file_logging(config=None):
+    """
+    Enable file logging with rotation support
+
+    This will output logs to a file with automatic rotation when size limit is reached.
+    """
+    # Load configuration
+    if config is None:
+        config = load_logger_config()
+
+    # Check if file logging is enabled
+    if not config or 'logger' not in config or 'file' not in config['logger']:
+        return
+
+    file_config = config['logger']['file']
+    if not file_config.get('enable', False):
+        return
+
+    # Get file logging parameters
+    file_path = file_config.get('path', 'logs/application.log')
+    max_bytes = file_config.get('max_bytes', 10485760)  # Default 10MB
+    backup_count = file_config.get('backup_count', 5)
+    log_level = getattr(logging, file_config.get('level', 'INFO'))
+    log_format = file_config.get('format', DEFAULT_LOG_FORMAT)
+
+    # Get root logger
+    root_logger = logging.getLogger()
+
+    # Check if file handler already exists
+    has_file_handler = any(isinstance(h, RotatingFileHandler) for h in root_logger.handlers)
+    if has_file_handler:
+        logger.info("File logging already enabled")
+        return
+
+    # Add file handler to root logger
+    try:
+        file_handler = _create_file_handler(file_path, log_level, log_format, max_bytes, backup_count)
+        root_logger.addHandler(file_handler)
+        logger.info(f"File logging enabled: {file_path} (max: {max_bytes} bytes, backups: {backup_count})")
+    except Exception as e:
+        logger.error(f"Failed to setup file logging: {e}")
+
+
 def setup_application_logging(logger_config=None):
     """
     Setup application logging based on logger.yaml configuration
@@ -140,6 +203,10 @@ def setup_application_logging(logger_config=None):
     if not logger_config or 'logger' not in logger_config:
         logger.debug("No valid logger configuration found, skipping logging setup")
         return
+
+    # Enable file logging if configured
+    if logger_config['logger'].get('file', {}).get('enable', False):
+        setup_file_logging(logger_config)
 
     # Enable injector logging if configured
     if logger_config['logger'].get('injector', {}).get('enable', False):

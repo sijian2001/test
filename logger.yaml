@@ -4,6 +4,15 @@ logger:
     level: INFO
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+  # File logging configuration (optional)
+  file:
+    enable: false  # Set to true to enable file logging with rotation
+    path: "logs/application.log"
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+    level: INFO
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
   # Injector logger configuration
   injector:
     enable: true  # Set to true to enable injector debug logging

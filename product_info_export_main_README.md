@@ -19,6 +19,15 @@ logger:
     level: INFO
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+  # File logging configuration (optional)
+  file:
+    enable: false  # Set to true to enable file logging with rotation
+    path: "logs/application.log"
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+    level: INFO
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
   # Injector logger configuration
   injector:
     enable: false  # Set to true to enable injector debug logging
@@ -42,6 +51,40 @@ logger:
     orm:
       level: DEBUG
 ```
+
+## File Logging with Rotation
+
+### Enable File Logging
+
+To enable persistent file logging with automatic rotation:
+
+```yaml
+file:
+  enable: true  # Change from false to true
+  path: "logs/application.log"
+  max_bytes: 10485760  # 10MB per file
+  backup_count: 5  # Keep 5 backup files
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+```
+
+### Rotation Behavior
+
+- **Size-based rotation**: When the log file reaches `max_bytes`, it's automatically rotated
+- **Backup files**: Old logs are renamed to `application.log.1`, `application.log.2`, etc.
+- **Automatic cleanup**: Only `backup_count` files are kept; oldest are deleted
+- **Total storage**: Maximum disk usage = `max_bytes × (backup_count + 1)`
+
+Example with default settings:
+- Max file size: 10MB
+- Backup count: 5
+- Total storage: 60MB (10MB × 6 files)
+
+### Use Cases
+
+- **Production environments**: Persistent logging for auditing and troubleshooting
+- **Long-running processes**: Automatic log management without manual intervention
+- **Compliance**: Maintaining historical logs for regulatory requirements
 
 ## Enabling Debug Logging
 
@@ -238,13 +281,51 @@ sqlalchemy:
 
 No need to change environment variables or restart the system—just edit the config file and run the application.
 
+## Performance Impact
+
+### SQLAlchemy Logging
+
+**⚠️ Important Performance Considerations:**
+
+- **DEBUG Level**: Setting `sqlalchemy.engine.level` to `DEBUG` outputs both SQL statements AND result sets
+  - This can significantly impact performance when handling large datasets
+  - Result set output adds substantial overhead for queries returning many rows
+  - Memory usage increases as all results are formatted for logging
+
+- **INFO Level**: Only outputs SQL statements (recommended for most debugging)
+  - Minimal performance impact
+  - Sufficient for identifying slow queries and execution patterns
+
+**Performance Impact Examples:**
+
+| Dataset Size | INFO Level Impact | DEBUG Level Impact |
+|--------------|-------------------|-------------------|
+| Small (< 100 rows) | Negligible (< 1%) | Minor (~5-10%) |
+| Medium (100-1000 rows) | Negligible (< 2%) | Moderate (~15-25%) |
+| Large (> 1000 rows) | Minor (~2-5%) | Significant (~30-50%) |
+
+### Injector Logging
+
+- **Minimal Impact**: Dependency injection logging occurs only during object creation
+- Safe to enable in most scenarios
+- Primary impact is increased log volume, not execution time
+
+### Recommendations
+
+1. **Development**: Enable both loggers with appropriate levels
+2. **Testing**: Use INFO level for SQLAlchemy to verify query execution
+3. **Production**: **ALWAYS set `enable: false`** for both loggers
+4. **Performance Tuning**: Temporarily enable with INFO level to identify bottlenecks
+5. **Large Datasets**: Avoid DEBUG level for SQLAlchemy engine logger
+
 ## Best Practices
 
 1. **Development**: Enable both loggers during development for full visibility
 2. **Testing**: Use logging to verify dependency wiring and SQL execution
-3. **Production**: Disable debug logging for performance
-4. **Performance Tuning**: Enable SQLAlchemy logging to identify slow queries
+3. **Production**: **Disable all debug logging** (`enable: false`) for optimal performance
+4. **Performance Tuning**: Enable SQLAlchemy logging at INFO level to identify slow queries
 5. **Debugging**: Enable specific loggers based on the issue type
+6. **Large Datasets**: Never use DEBUG level for `sqlalchemy.engine` when processing large result sets
 
 ## Configuration Management
 

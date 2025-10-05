@@ -3,6 +3,7 @@ Tests for product_info_export_main module
 """
 import pytest
 import logging
+import logging.handlers
 from unittest.mock import patch, mock_open, MagicMock
 import yaml
 
@@ -14,10 +15,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from utils.logger_utils import (
     load_logger_config,
     _create_logger_handler,
+    _create_file_handler,
     _get_logger_config_value,
     _setup_logger,
     setup_injector_logging,
     setup_sqlalchemy_logging,
+    setup_file_logging,
     setup_application_logging
 )
 
@@ -242,11 +245,84 @@ class TestSetupSQLAlchemyLogging:
             assert len(engine_logger.handlers) > 0
 
 
+class TestSetupFileLogging:
+    """Tests for setup_file_logging function"""
+
+    def setup_method(self):
+        """Clear root logger file handlers before each test"""
+        root_logger = logging.getLogger()
+        root_logger.handlers = [h for h in root_logger.handlers
+                               if not isinstance(h, logging.handlers.RotatingFileHandler)]
+
+    def test_setup_file_logging_enabled(self):
+        """Test setup with file.enable=true"""
+        import tempfile
+        import os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_file = os.path.join(tmpdir, 'test.log')
+            config = {
+                'logger': {
+                    'file': {
+                        'enable': True,
+                        'path': log_file,
+                        'max_bytes': 1024,
+                        'backup_count': 3,
+                        'level': 'INFO',
+                        'format': '%(message)s'
+                    }
+                }
+            }
+            setup_file_logging(config)
+
+            root_logger = logging.getLogger()
+            has_file_handler = any(isinstance(h, logging.handlers.RotatingFileHandler)
+                                  for h in root_logger.handlers)
+            assert has_file_handler
+
+            # Close and remove file handler before tempdir cleanup
+            for handler in root_logger.handlers[:]:
+                if isinstance(handler, logging.handlers.RotatingFileHandler):
+                    handler.close()
+                    root_logger.removeHandler(handler)
+
+    def test_setup_file_logging_disabled(self):
+        """Test setup with file.enable=false"""
+        config = {
+            'logger': {
+                'file': {
+                    'enable': False,
+                    'path': 'test.log'
+                }
+            }
+        }
+        setup_file_logging(config)
+
+        root_logger = logging.getLogger()
+        has_file_handler = any(isinstance(h, logging.handlers.RotatingFileHandler)
+                              for h in root_logger.handlers)
+        assert not has_file_handler
+
+    def test_setup_file_logging_no_config(self):
+        """Test setup without file configuration"""
+        with patch('utils.logger_utils.load_logger_config', return_value=None):
+            setup_file_logging()
+
+            root_logger = logging.getLogger()
+            has_file_handler = any(isinstance(h, logging.handlers.RotatingFileHandler)
+                                  for h in root_logger.handlers)
+            assert not has_file_handler
+
+
 class TestSetupApplicationLogging:
     """Tests for setup_application_logging function"""
 
     def setup_method(self):
         """Clear logger handlers before each test"""
+        root_logger = logging.getLogger()
+        root_logger.handlers = [h for h in root_logger.handlers
+                               if not isinstance(h, logging.handlers.RotatingFileHandler)]
+
         for logger_name in ['injector', 'sqlalchemy.engine', 'sqlalchemy.pool',
                            'sqlalchemy.dialects', 'sqlalchemy.orm']:
             test_logger = logging.getLogger(logger_name)
