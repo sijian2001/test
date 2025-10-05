@@ -80,7 +80,7 @@ sqlalchemy:
 ### Normal Execution (Without Debug Logging)
 
 ```bash
-python product_info_export_main.py
+python batch/product_info_export_main.py
 ```
 
 Output:
@@ -95,7 +95,7 @@ INFO:batch.product_info_csv_export_processor:=== Starting Product Info CSV Expor
 After setting `injector.enable: true` in `logger.yaml`:
 
 ```bash
-python product_info_export_main.py
+python batch/product_info_export_main.py
 ```
 
 Output will include detailed dependency injection traces:
@@ -114,7 +114,7 @@ INFO:utils.logger_utils:Injector debug logging enabled
 After setting `sqlalchemy.enable: true` in `logger.yaml`:
 
 ```bash
-python product_info_export_main.py
+python batch/product_info_export_main.py
 ```
 
 Output will include SQL execution details:

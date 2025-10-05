@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import logging
+
+# Add project root to sys.path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from injector import Injector
 from batch.product_info_csv_export_processor import ProductInfoCsvExportProcessorImpl
 from utils.logger_utils import setup_application_logging
