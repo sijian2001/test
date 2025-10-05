@@ -27,13 +27,13 @@ python -m pytest tests/business/test_product_info_service.py -v
 ### メインアプリケーション
 ```bash
 # ユーザー管理（test1データベース）
-python batch/csv_import_main.py        # CSV からユーザー・部署をインポート
-python batch/csv_export_main.py        # ユーザー情報をCSVエクスポート
+python app/batch/csv_import_main.py        # CSV からユーザー・部署をインポート
+python app/batch/csv_export_main.py        # ユーザー情報をCSVエクスポート
 
 # 商品管理（test2データベース）
-python batch/categories_import_main.py # CSV からカテゴリをインポート
-python batch/products_import_main.py   # CSV から商品をインポート
-python batch/product_info_export_main.py # 商品情報をCSVエクスポート
+python app/batch/categories_import_main.py # CSV からカテゴリをインポート
+python app/batch/products_import_main.py   # CSV から商品をインポート
+python app/batch/product_info_export_main.py # 商品情報をCSVエクスポート
 ```
 
 ## アーキテクチャ概要
@@ -48,17 +48,17 @@ python batch/product_info_export_main.py # 商品情報をCSVエクスポート
 
 ### コアアーキテクチャ層
 
-**リポジトリ層** (`domain/repository/`):
+**リポジトリ層** (`app/domain/repository/`):
 - データベース別に整理: `test1/`と`test2/`サブディレクトリ
 - SQLAlchemy ORMによるデータアクセス抽象化
 - 例: `user_repository.py`, `product_repository.py`
 
-**サービス層** (`business/`):
+**サービス層** (`app/business/`):
 - AbstractServiceパターンに従ったビジネスロジック実装
 - 全サービスが`execute(in_dto) -> out_dto`インターフェースを実装
 - `@SessionManager`デコレーターによるセッション管理
 
-**バッチ層** (`batch/`):
+**バッチ層** (`app/batch/`):
 - CSV インポート/エクスポート処理
 - 基底`Processor`クラスから継承
 - 例: `csv_import_processor.py`, `product_info_csv_export_processor.py`
@@ -71,13 +71,13 @@ python batch/product_info_export_main.py # 商品情報をCSVエクスポート
 ### セッション管理
 - カスタム`@SessionManager`デコレーターがトランザクションライフサイクルを処理
 - 適切なエラーハンドリングによる自動コミット/ロールバック
-- `business/decorators/session_manager.py`に配置
+- `app/business/decorators/session_manager.py`に配置
 
 ### データベース移行に関する注意
 コードベースは従来の`DatabaseSession.get_session(database)`パターンから直接`Test1DatabaseSession`/`Test2DatabaseSession`インジェクションへ移行中です。変更時は新しいセッションクラスを使用してください。
 
 ### バリューオブジェクト
-データ転送用のバリューオブジェクトは`business/vo/`に配置:
+データ転送用のバリューオブジェクトは`app/business/vo/`に配置:
 - `user_vo.py`, `product_vo.py`, `category_vo.py`, `department_vo.py`
 - サービス層とバッチ層間でのデータ転送に使用
 

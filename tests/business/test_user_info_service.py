@@ -7,9 +7,9 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from business.user_info_service import UserInfoService, UserInfoSearchInDto, UserInfoOutDto
-from domain.repository.test1.user_info_repository import UserInfoRepository
-from domain.model.test1.user_info import UserInfo
+from app.business.user_info_service import UserInfoService, UserInfoSearchInDto, UserInfoOutDto
+from app.domain.repository.test1.user_info_repository import UserInfoRepository
+from app.domain.model.test1.user_info import UserInfo
 
 
 class TestUserInfoService:
@@ -255,7 +255,7 @@ class TestUserInfoService:
         self.service.__post_init__()
         assert hasattr(self.service, 'logger')
 
-    @patch('business.user_info_service.logging.getLogger')
+    @patch('app.business.user_info_service.logging.getLogger')
     def test_logging_calls(self, mock_get_logger):
         """Test that appropriate logging calls are made"""
         # Arrange

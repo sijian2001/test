@@ -6,9 +6,9 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from batch.products_csv_import_processor import ProductsCsvImportProcessorImpl
-from business.product_regist_service import ProductRegistService, ProductRegistInDto, ProductRegistOutDto
-from business.vo.product_vo import ProductVo
+from app.batch.products_csv_import_processor import ProductsCsvImportProcessorImpl
+from app.business.product_regist_service import ProductRegistService, ProductRegistInDto, ProductRegistOutDto
+from app.business.vo.product_vo import ProductVo
 
 
 class TestProductsCsvImportProcessorImpl:
@@ -25,8 +25,8 @@ class TestProductsCsvImportProcessorImpl:
         )
         self.processor.__post_init__()
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_success(self, mock_file, mock_exists):
         """Test successful CSV import process"""
         # Arrange
@@ -48,7 +48,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Keyboard', 'description': 'Mechanical keyboard', 'price': '79.99', 'stock_quantity': '25', 'category_id': '2'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -89,7 +89,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert products[2].stock_quantity == 25
             assert products[2].category_id == 2
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
     def test_run_csv_import_process_file_not_found(self, mock_exists):
         """Test CSV import when file does not exist"""
         # Arrange
@@ -103,14 +103,14 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
         mock_exists.assert_called_once_with(os.path.join("work", "products.csv"))
         self.mock_product_regist_service.execute.assert_not_called()
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_empty_file(self, mock_file, mock_exists):
         """Test CSV import with empty file"""
         # Arrange
         mock_exists.return_value = True
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = []
 
             # Act
@@ -120,8 +120,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert result is True
             self.mock_product_regist_service.execute.assert_not_called()
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_missing_required_fields(self, mock_file, mock_exists):
         """Test CSV import with missing required fields"""
         # Arrange
@@ -135,7 +135,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Another Valid Product', 'description': 'Another description', 'price': '30.00', 'stock_quantity': '20', 'category_id': '4'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -154,8 +154,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert len(call_args.productList) == 1
             assert call_args.productList[0].product_name == 'Another Valid Product'
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_data_conversion_error(self, mock_file, mock_exists):
         """Test CSV import with data conversion errors"""
         # Arrange
@@ -169,7 +169,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Product4', 'description': 'Description4', 'price': '45.99', 'stock_quantity': '15', 'category_id': '4'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -191,8 +191,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert call_args.productList[0].stock_quantity == 15
             assert call_args.productList[0].category_id == 4
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_service_exception(self, mock_file, mock_exists):
         """Test CSV import when service raises exception"""
         # Arrange
@@ -202,7 +202,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Test Product', 'description': 'Test Description', 'price': '19.99', 'stock_quantity': '5', 'category_id': '1'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service to raise exception
@@ -215,8 +215,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert result is False
             self.mock_product_regist_service.execute.assert_called_once()
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open')
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open')
     def test_run_csv_import_process_file_read_exception(self, mock_file, mock_exists):
         """Test CSV import when file read raises exception"""
         # Arrange
@@ -230,8 +230,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
         assert result is False
         self.mock_product_regist_service.execute.assert_not_called()
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_with_none_and_empty_values(self, mock_file, mock_exists):
         """Test CSV import with None and empty string values"""
         # Arrange
@@ -244,7 +244,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Product3', 'description': 'Valid Description', 'price': '30.99', 'stock_quantity': '0', 'category_id': '0'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response - only valid product will be processed
@@ -269,8 +269,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert products[0].stock_quantity == 0
             assert products[0].category_id == 0
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_with_whitespace(self, mock_file, mock_exists):
         """Test CSV import with whitespace in values"""
         # Arrange
@@ -281,7 +281,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Mouse\t', 'description': '\tWireless gaming mouse\t', 'price': '49.99', 'stock_quantity': '10', 'category_id': ''}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -310,8 +310,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert products[1].stock_quantity == 10
             assert products[1].category_id is None
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_decimal_price_handling(self, mock_file, mock_exists):
         """Test CSV import with various decimal price formats"""
         # Arrange
@@ -324,7 +324,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Product4', 'description': 'Description4', 'price': '0.01', 'stock_quantity': '20', 'category_id': '4'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -346,8 +346,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert products[2].price == 30.99
             assert products[3].price == 0.01
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_row_exception_handling(self, mock_file, mock_exists):
         """Test CSV import with row-level exceptions"""
         # Arrange
@@ -358,7 +358,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Product1', 'description': 'Description1', 'price': '10.99', 'stock_quantity': '5', 'category_id': '1'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -376,7 +376,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             assert len(call_args.productList) == 1
             assert call_args.productList[0].product_name == 'Product1'
 
-    @patch('batch.products_csv_import_processor.logging.getLogger')
+    @patch('app.batch.products_csv_import_processor.logging.getLogger')
     def test_post_init_method(self, mock_get_logger):
         """Test that __post_init__ method initializes logger correctly"""
         # Arrange
@@ -387,12 +387,12 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
         self.processor.__post_init__()
 
         # Assert
-        mock_get_logger.assert_called_with('batch.products_csv_import_processor')
+        mock_get_logger.assert_called_with('app.batch.products_csv_import_processor')
         assert self.processor.logger == mock_logger
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
-    @patch('batch.products_csv_import_processor.logging.getLogger')
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.logging.getLogger')
     def test_logging_calls_success(self, mock_get_logger, mock_file, mock_exists):
         """Test that appropriate logging calls are made for successful import"""
         # Arrange
@@ -406,7 +406,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             {'product_name': 'Test Product', 'description': 'Test Description', 'price': '19.99', 'stock_quantity': '5', 'category_id': '1'}
         ]
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             mock_result = ProductRegistOutDto(productCount=1)
@@ -421,8 +421,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
             # Should have start, file reading, parsing, registration, and completion messages
             assert mock_logger.info.call_count >= 5
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.logging.getLogger')
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.logging.getLogger')
     def test_logging_calls_file_not_found(self, mock_get_logger, mock_exists):
         """Test that appropriate logging calls are made when file not found"""
         # Arrange
@@ -471,8 +471,8 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
         assert product_vo2.stock_quantity == 0
         assert product_vo2.category_id is None
 
-    @patch('batch.products_csv_import_processor.os.path.exists')
-    @patch('batch.products_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.products_csv_import_processor.os.path.exists')
+    @patch('app.batch.products_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_large_dataset(self, mock_file, mock_exists):
         """Test CSV import with large number of products"""
         # Arrange
@@ -489,7 +489,7 @@ Keyboard,Mechanical keyboard,79.99,25,2"""
                 'category_id': f'{(i % 5) + 1}'
             })
 
-        with patch('batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.products_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response

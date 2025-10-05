@@ -1,11 +1,1 @@
 product_id,product_name,description,price,stock_quantity,category_id,category_name,category_description,parent_category_id,created_at,updated_at
-9,Bluetooth Speaker,Portable waterproof Bluetooth speaker,59.99,35,5,Audio,Audio equipment and accessories,1,2025-09-18 21:15:01,2025-09-18 21:15:01
-10,External SSD 1TB,Fast external SSD drive with USB 3.0,149.99,12,4,Storage,Data storage devices and solutions,1,2025-09-18 21:15:01,2025-09-18 21:15:01
-6,Gaming Headset,Surround sound gaming headset with noise cancellation,79.99,20,5,Audio,Audio equipment and accessories,1,2025-09-18 21:15:01,2025-09-18 21:15:01
-1,Laptop Pro 15,High-performance laptop with 16GB RAM and 512GB SSD,1299.99,10,1,Electronics,Electronic devices and gadgets,,2025-09-18 21:15:00,2025-09-18 21:15:00
-3,Mechanical Keyboard,RGB backlit mechanical keyboard with brown switches,89.99,25,2,Computer Accessories,Accessories for computers and laptops,1,2025-09-18 21:15:00,2025-09-18 21:15:00
-4,Monitor 24 inch,4K Ultra HD monitor with HDR support,349.99,15,3,Monitors,Display monitors and screens,1,2025-09-18 21:15:01,2025-09-18 21:15:01
-7,Smartphone Pro,Latest flagship smartphone with 128GB storage,799.99,30,1,Electronics,Electronic devices and gadgets,,2025-09-18 21:15:01,2025-09-18 21:15:01
-8,Tablet 10 inch,Lightweight tablet with 64GB storage,299.99,40,1,Electronics,Electronic devices and gadgets,,2025-09-18 21:15:01,2025-09-18 21:15:01
-5,USB-C Cable,Premium USB-C to USB-C cable 6ft,19.99,100,4,Storage,Data storage devices and solutions,1,2025-09-18 21:15:01,2025-09-18 21:15:01
-2,Wireless Mouse,Ergonomic wireless mouse with USB receiver,29.99,50,2,Computer Accessories,Accessories for computers and laptops,1,2025-09-18 21:15:00,2025-09-18 21:15:00

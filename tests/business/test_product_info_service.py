@@ -7,9 +7,9 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from business.product_info_service import ProductInfoService, ProductInfoSearchInDto, ProductInfoOutDto
-from domain.repository.test2.product_info_repository import ProductInfoRepository
-from domain.model.test2.product_info import ProductInfo
+from app.business.product_info_service import ProductInfoService, ProductInfoSearchInDto, ProductInfoOutDto
+from app.domain.repository.test2.product_info_repository import ProductInfoRepository
+from app.domain.model.test2.product_info import ProductInfo
 
 
 class TestProductInfoService:
@@ -433,7 +433,7 @@ class TestProductInfoService:
         self.service.__post_init__()
         assert hasattr(self.service, 'logger')
 
-    @patch('business.product_info_service.logging.getLogger')
+    @patch('app.business.product_info_service.logging.getLogger')
     def test_logging_calls(self, mock_get_logger):
         """Test that appropriate logging calls are made"""
         # Arrange

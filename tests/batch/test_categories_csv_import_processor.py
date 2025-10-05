@@ -6,9 +6,9 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from batch.categories_csv_import_processor import CategoriesCsvImportProcessorImpl
-from business.category_regist_service import CategoryRegistService, CategoryRegistInDto, CategoryRegistOutDto
-from business.vo.category_vo import CategoryVo
+from app.batch.categories_csv_import_processor import CategoriesCsvImportProcessorImpl
+from app.business.category_regist_service import CategoryRegistService, CategoryRegistInDto, CategoryRegistOutDto
+from app.business.vo.category_vo import CategoryVo
 
 
 class TestCategoriesCsvImportProcessorImpl:
@@ -25,8 +25,8 @@ class TestCategoriesCsvImportProcessorImpl:
         )
         self.processor.__post_init__()
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_success(self, mock_file, mock_exists):
         """Test successful CSV import process"""
         # Arrange
@@ -48,7 +48,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Smartphones', 'category_description': 'Mobile phones and accessories', 'parent_category_id': '1'}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -83,7 +83,7 @@ Smartphones,Mobile phones and accessories,1"""
             assert categories[2].category_description == 'Mobile phones and accessories'
             assert categories[2].parent_category_id == 1
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
     def test_run_csv_import_process_file_not_found(self, mock_exists):
         """Test CSV import when file does not exist"""
         # Arrange
@@ -97,14 +97,14 @@ Smartphones,Mobile phones and accessories,1"""
         mock_exists.assert_called_once_with(os.path.join("work", "categories.csv"))
         self.mock_category_regist_service.execute.assert_not_called()
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_empty_file(self, mock_file, mock_exists):
         """Test CSV import with empty file"""
         # Arrange
         mock_exists.return_value = True
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = []
 
             # Act
@@ -114,8 +114,8 @@ Smartphones,Mobile phones and accessories,1"""
             assert result is True
             self.mock_category_regist_service.execute.assert_not_called()
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_missing_required_fields(self, mock_file, mock_exists):
         """Test CSV import with missing required fields"""
         # Arrange
@@ -128,7 +128,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Valid Category', 'category_description': 'Valid description', 'parent_category_id': ''}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -147,8 +147,8 @@ Smartphones,Mobile phones and accessories,1"""
             assert len(call_args.categoryList) == 1
             assert call_args.categoryList[0].category_name == 'Valid Category'
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_data_conversion_error(self, mock_file, mock_exists):
         """Test CSV import with data conversion errors"""
         # Arrange
@@ -160,7 +160,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Category2', 'category_description': 'Description2', 'parent_category_id': '2'}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -180,8 +180,8 @@ Smartphones,Mobile phones and accessories,1"""
             assert call_args.categoryList[0].category_name == 'Category2'
             assert call_args.categoryList[0].parent_category_id == 2
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_service_exception(self, mock_file, mock_exists):
         """Test CSV import when service raises exception"""
         # Arrange
@@ -191,7 +191,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Test Category', 'category_description': 'Test Description', 'parent_category_id': ''}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service to raise exception
@@ -204,8 +204,8 @@ Smartphones,Mobile phones and accessories,1"""
             assert result is False
             self.mock_category_regist_service.execute.assert_called_once()
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open')
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open')
     def test_run_csv_import_process_file_read_exception(self, mock_file, mock_exists):
         """Test CSV import when file read raises exception"""
         # Arrange
@@ -219,8 +219,8 @@ Smartphones,Mobile phones and accessories,1"""
         assert result is False
         self.mock_category_regist_service.execute.assert_not_called()
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_with_none_and_empty_values(self, mock_file, mock_exists):
         """Test CSV import with None and empty string values"""
         # Arrange
@@ -232,7 +232,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Category3', 'category_description': 'Valid Description', 'parent_category_id': '0'}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -264,8 +264,8 @@ Smartphones,Mobile phones and accessories,1"""
             assert categories[2].category_description == 'Valid Description'
             assert categories[2].parent_category_id == 0
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_with_whitespace(self, mock_file, mock_exists):
         """Test CSV import with whitespace in values"""
         # Arrange
@@ -276,7 +276,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Computers\t', 'category_description': '\tComputer hardware\t', 'parent_category_id': ''}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -301,8 +301,8 @@ Smartphones,Mobile phones and accessories,1"""
             assert categories[1].category_description == 'Computer hardware'
             assert categories[1].parent_category_id is None
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
     def test_run_csv_import_process_row_exception_handling(self, mock_file, mock_exists):
         """Test CSV import with row-level exceptions"""
         # Arrange
@@ -313,7 +313,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Category1', 'category_description': 'Description1', 'parent_category_id': ''}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             # Mock service response
@@ -331,7 +331,7 @@ Smartphones,Mobile phones and accessories,1"""
             assert len(call_args.categoryList) == 1
             assert call_args.categoryList[0].category_name == 'Category1'
 
-    @patch('batch.categories_csv_import_processor.logging.getLogger')
+    @patch('app.batch.categories_csv_import_processor.logging.getLogger')
     def test_post_init_method(self, mock_get_logger):
         """Test that __post_init__ method initializes logger correctly"""
         # Arrange
@@ -342,12 +342,12 @@ Smartphones,Mobile phones and accessories,1"""
         self.processor.__post_init__()
 
         # Assert
-        mock_get_logger.assert_called_with('batch.categories_csv_import_processor')
+        mock_get_logger.assert_called_with('app.batch.categories_csv_import_processor')
         assert self.processor.logger == mock_logger
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.open', new_callable=mock_open)
-    @patch('batch.categories_csv_import_processor.logging.getLogger')
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.open', new_callable=mock_open)
+    @patch('app.batch.categories_csv_import_processor.logging.getLogger')
     def test_logging_calls_success(self, mock_get_logger, mock_file, mock_exists):
         """Test that appropriate logging calls are made for successful import"""
         # Arrange
@@ -361,7 +361,7 @@ Smartphones,Mobile phones and accessories,1"""
             {'category_name': 'Electronics', 'category_description': 'Electronic devices', 'parent_category_id': ''}
         ]
 
-        with patch('batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
+        with patch('app.batch.categories_csv_import_processor.csv.DictReader') as mock_dict_reader:
             mock_dict_reader.return_value = mock_csv_data
 
             mock_result = CategoryRegistOutDto(categoryCount=1)
@@ -376,8 +376,8 @@ Smartphones,Mobile phones and accessories,1"""
             # Should have start, file reading, parsing, registration, and completion messages
             assert mock_logger.info.call_count >= 5
 
-    @patch('batch.categories_csv_import_processor.os.path.exists')
-    @patch('batch.categories_csv_import_processor.logging.getLogger')
+    @patch('app.batch.categories_csv_import_processor.os.path.exists')
+    @patch('app.batch.categories_csv_import_processor.logging.getLogger')
     def test_logging_calls_file_not_found(self, mock_get_logger, mock_exists):
         """Test that appropriate logging calls are made when file not found"""
         # Arrange

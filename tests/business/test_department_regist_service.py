@@ -7,10 +7,10 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from business.department_regist_service import DepartmentRegistService, DepartmentRegistInDto, DepartmentRegistOutDto
-from domain.repository.test1.department_repository import DepartmentRepository
-from domain.model.test1.department import Department
-from business.vo.department_vo import DepartmentVo
+from app.business.department_regist_service import DepartmentRegistService, DepartmentRegistInDto, DepartmentRegistOutDto
+from app.domain.repository.test1.department_repository import DepartmentRepository
+from app.domain.model.test1.department import Department
+from app.business.vo.department_vo import DepartmentVo
 
 
 class TestDepartmentRegistService:
@@ -293,7 +293,7 @@ class TestDepartmentRegistService:
         self.service.__post_init__()
         assert hasattr(self.service, 'logger')
 
-    @patch('business.department_regist_service.logging.getLogger')
+    @patch('app.business.department_regist_service.logging.getLogger')
     def test_logging_calls_success(self, mock_get_logger):
         """Test that appropriate logging calls are made for successful registration"""
         # Arrange
@@ -315,7 +315,7 @@ class TestDepartmentRegistService:
         # Should have at least: start, per-department, count, and completion messages
         assert mock_logger.info.call_count >= 4
 
-    @patch('business.department_regist_service.logging.getLogger')
+    @patch('app.business.department_regist_service.logging.getLogger')
     def test_logging_calls_failure(self, mock_get_logger):
         """Test that appropriate logging calls are made for failed registration"""
         # Arrange
