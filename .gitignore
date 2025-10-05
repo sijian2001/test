@@ -65,6 +65,11 @@ logs/
 # Generated CSV files
 work/*.csv
 
+# pydeps generated files
+*.svg
+*.png
+*.dot
+
 # Claude Code configuration (個人用設定)
 .claude/
 .serena/
