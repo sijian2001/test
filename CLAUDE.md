@@ -68,10 +68,46 @@ python app/batch/product_info_export_main.py # 商品情報をCSVエクスポー
 - シングルトンデータベース接続と設定
 - 型ベースの依存関係解決
 
-### セッション管理
-- カスタム`@SessionManager`デコレーターがトランザクションライフサイクルを処理
-- 適切なエラーハンドリングによる自動コミット/ロールバック
-- `app/business/decorators/session_manager.py`に配置
+### トランザクション管理
+
+**Transactionalデコレーター** (`app/business/decorators/transactional.py`):
+- Spring Frameworkの`@Transactional`アノテーションにインスパイアされた宣言的トランザクション管理
+- 明示的なトランザクション境界の定義
+- 自動コミット/ロールバック制御
+- カスタマイズ可能なロールバックルール
+
+使用例:
+```python
+from app.business.decorators.transactional import Transactional
+from app.business.decorators.database_enum import Database
+
+@Transactional(database=Database.TEST1)
+def create_user(self, dto: CreateUserDto) -> UserDto:
+    # トランザクション内で自動実行
+    # 成功時: 自動コミット
+    # 例外時: 自動ロールバック
+    return self.user_repository.create(dto)
+
+@Transactional(database=Database.TEST1, read_only=True)
+def get_users(self) -> List[UserDto]:
+    # 読み取り専用トランザクション（最適化ヒント）
+    return self.user_repository.get_all()
+
+@Transactional(
+    database=Database.TEST1,
+    rollback_for=(ValueError, TypeError),
+    no_rollback_for=(KeyError,)
+)
+def process_data(self, dto: DataDto) -> ResultDto:
+    # カスタムロールバックルール
+    # ValueError, TypeError: ロールバック
+    # KeyError: コミット
+    pass
+```
+
+**SessionManagerデコレーター** (レガシー、`app/business/decorators/session_manager.py`):
+- 基本的なセッション管理とトランザクション処理
+- 新規開発では`Transactional`デコレーターの使用を推奨
 
 ### データベース移行に関する注意
 コードベースは従来の`DatabaseSession.get_session(database)`パターンから直接`Test1DatabaseSession`/`Test2DatabaseSession`インジェクションへ移行中です。変更時は新しいセッションクラスを使用してください。

@@ -6,6 +6,8 @@ import logging
 from app.business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
 from app.domain.repository.test1.user_repository import UserRepository
 from app.business.vo.user_vo import UserVo
+from app.business.decorators.transactional import Transactional
+from app.business.decorators.database_enum import Database
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,7 +31,8 @@ class UserRegistService(AbstractUserRegistService):
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)
-    
+
+    @Transactional(database=Database.TEST1)
     def execute(self, in_dto: UserRegistInDto) -> UserRegistOutDto:
         self.logger.info("=== Starting User Registration ===")
         

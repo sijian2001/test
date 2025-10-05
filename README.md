@@ -210,7 +210,9 @@ python -m pytest tests/business/test_category_regist_service.py -v
 │   │   └── products_import_main.py                # 商品取込メインプログラム
 │   ├── business/                                   # ビジネスロジック
 │   │   ├── decorators/                            # デコレータ
-│   │   │   └── session_manager.py                # セッション管理デコレータ
+│   │   │   ├── database_enum.py                  # データベース識別Enum
+│   │   │   ├── session_manager.py                # セッション管理デコレータ（レガシー）
+│   │   │   └── transactional.py                  # トランザクション管理デコレータ（推奨）
 │   │   ├── abstract_service.py                   # サービス抽象クラス
 │   │   ├── category_regist_service.py            # カテゴリ登録サービス
 │   │   ├── csv_export_service.py                 # CSV出力サービス
@@ -308,6 +310,41 @@ python -m pytest tests/business/test_category_regist_service.py -v
 - **Batch層**: バッチ処理実行
 - **依存関係注入**: @inject、@dataclassによるDI実装
 - **マルチデータベース対応**: test1とtest2の独立した管理
+- **トランザクション管理**: Spring風の宣言的トランザクション制御（`@Transactional`デコレーター）
+
+#### トランザクション管理の使用例
+
+**基本的な使用（自動コミット/ロールバック）**:
+```python
+from app.business.decorators.transactional import Transactional
+from app.business.decorators.database_enum import Database
+
+@Transactional(database=Database.TEST1)
+def create_user(self, dto: CreateUserDto) -> UserDto:
+    # 成功時: 自動コミット
+    # 例外時: 自動ロールバック
+    return self.user_repository.create(dto)
+```
+
+**読み取り専用トランザクション**:
+```python
+@Transactional(database=Database.TEST1, read_only=True)
+def get_all_users(self) -> List[UserDto]:
+    # 読み取り専用（パフォーマンス最適化ヒント）
+    return self.user_repository.get_all()
+```
+
+**カスタムロールバックルール**:
+```python
+@Transactional(
+    database=Database.TEST1,
+    rollback_for=(ValueError, TypeError),  # これらの例外でロールバック
+    no_rollback_for=(KeyError,)             # この例外ではコミット
+)
+def process_data(self, dto: DataDto) -> ResultDto:
+    # カスタムロールバック制御
+    pass
+```
 
 ### テスト構成
 - **包括的な単体テスト**: 全層の完全なテストカバレッジ
