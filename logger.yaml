@@ -15,13 +15,13 @@ logger:
 
   # Injector logger configuration
   injector:
-    enable: true  # Set to true to enable injector debug logging
+    enable: false  # Set to true to enable injector debug logging
     level: DEBUG
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
   # SQLAlchemy logger configuration
   sqlalchemy:
-    enable: true  # Set to true to enable SQLAlchemy debug logging
+    enable: false  # Set to true to enable SQLAlchemy debug logging
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     # Engine logger: outputs SQL statements
     engine:
