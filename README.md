@@ -61,6 +61,24 @@ setup.bat
    pip install -r requirements.txt
    ```
 
+4. **パッケージとしてインストール（推奨）**
+   ```bash
+   # 通常インストール
+   pip install -e .
+
+   # 開発用依存関係も含めてインストール
+   pip install -e ".[dev]"
+   ```
+
+   インストール後、以下のコマンドが使用可能になります:
+   ```bash
+   csv-import          # ユーザー・部署CSVインポート
+   csv-export          # ユーザー情報CSVエクスポート
+   categories-import   # カテゴリCSVインポート
+   products-import     # 商品CSVインポート
+   product-info-export # 商品情報CSVエクスポート
+   ```
+
 ### 仮想環境の使用
 
 - **有効化**: 開発開始時に実行
@@ -254,11 +272,15 @@ python -m pytest tests/business/test_category_regist_service.py -v
 │   ├── product_report.csv                        # 商品情報出力
 │   ├── report.csv                                # ユーザー情報出力
 │   └── user.csv                                  # ユーザーCSVサンプル
+├── scripts/                                        # ユーティリティスクリプト
+│   └── check_circular_imports.py                  # 循環importチェック
 ├── db.yaml                                         # データベース設定
 ├── logger.yaml                                     # ロガー設定
+├── pyproject.toml                                  # パッケージ設定
 ├── requirements.txt                                # Python依存関係
 ├── setup.bat                                       # Windows環境セットアップ
 ├── setup.sh                                       # Linux/macOS環境セットアップ
+├── MIGRATION.md                                    # 移行ガイド
 └── README.md                                      # このファイル
 ```
 
@@ -292,3 +314,21 @@ python -m pytest tests/business/test_category_regist_service.py -v
 - **モック使用**: 外部依存の分離テスト
 - **例外処理テスト**: 異常系シナリオのカバー
 - **マルチデータベーステスト**: test1/test2両システムのテスト
+
+## 開発ツール
+
+### 循環importチェック
+プロジェクトの依存関係の健全性を確認するツールを提供しています。
+
+```bash
+# 循環importとアーキテクチャ違反をチェック
+python scripts/check_circular_imports.py
+```
+
+このツールは以下をチェックします:
+- 循環import（相互依存）の検出
+- アーキテクチャ違反（例: domain層からbusiness層への依存）の検出
+
+## 移行ガイド
+
+ソースフォルダ構造の変更に関する詳細な移行ガイドは、[MIGRATION.md](MIGRATION.md)を参照してください。
