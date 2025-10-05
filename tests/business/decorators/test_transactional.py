@@ -13,14 +13,20 @@ from app.business.decorators.database_enum import Database
 class TestTransactional:
     """Unit tests for Transactional decorator"""
 
-    def setup_method(self):
-        """Setup method called before each test"""
+    @pytest.fixture(autouse=True)
+    def setup_session_mocks(self):
+        """自動的にSessionHolderをモック（全テストで適用）"""
         # モックセッションの作成
         self.mock_session = Mock()
         self.mock_session.begin = Mock()
         self.mock_session.commit = Mock()
         self.mock_session.rollback = Mock()
         self.mock_session.close = Mock()
+
+        # SessionHolderをモック
+        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
+            mock_holder.get_session.return_value = self.mock_session
+            yield mock_holder
 
     def test_init_with_database_enum(self):
         """Test initialization with Database enum"""
@@ -113,112 +119,97 @@ class TestTransactional:
     def test_successful_execution_commits_transaction(self):
         """Test that successful method execution commits the transaction"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(database=Database.TEST1)
+        def test_method(self):
+            return "success"
 
-            @Transactional(database=Database.TEST1)
-            def test_method(self):
-                return "success"
+        instance = Mock()
 
-            instance = Mock()
+        # Act
+        result = test_method(instance)
 
-            # Act
-            result = test_method(instance)
-
-            # Assert
-            assert result == "success"
-            self.mock_session.begin.assert_called_once()
-            self.mock_session.commit.assert_called_once()
-            self.mock_session.rollback.assert_not_called()
-            self.mock_session.close.assert_called_once()
+        # Assert
+        assert result == "success"
+        self.mock_session.begin.assert_called_once()
+        self.mock_session.commit.assert_called_once()
+        self.mock_session.rollback.assert_not_called()
+        self.mock_session.close.assert_called_once()
 
     def test_exception_triggers_rollback(self):
         """Test that exception triggers rollback when in rollback_for"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(database=Database.TEST1, rollback_for=(ValueError,))
+        def test_method(self):
+            raise ValueError("test error")
 
-            @Transactional(database=Database.TEST1, rollback_for=(ValueError,))
-            def test_method(self):
-                raise ValueError("test error")
+        instance = Mock()
 
-            instance = Mock()
+        # Act & Assert
+        with pytest.raises(ValueError):
+            test_method(instance)
 
-            # Act & Assert
-            with pytest.raises(ValueError):
-                test_method(instance)
-
-            self.mock_session.begin.assert_called_once()
-            self.mock_session.commit.assert_not_called()
-            self.mock_session.rollback.assert_called_once()
-            self.mock_session.close.assert_called_once()
+        self.mock_session.begin.assert_called_once()
+        self.mock_session.commit.assert_not_called()
+        self.mock_session.rollback.assert_called_once()
+        self.mock_session.close.assert_called_once()
 
     def test_exception_not_in_rollback_for_does_not_rollback(self):
         """Test that exception not in rollback_for does not trigger rollback"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(database=Database.TEST1, rollback_for=(ValueError,))
+        def test_method(self):
+            raise TypeError("test error")
 
-            @Transactional(database=Database.TEST1, rollback_for=(ValueError,))
-            def test_method(self):
-                raise TypeError("test error")
+        instance = Mock()
 
-            instance = Mock()
+        # Act & Assert
+        with pytest.raises(TypeError):
+            test_method(instance)
 
-            # Act & Assert
-            with pytest.raises(TypeError):
-                test_method(instance)
-
-            self.mock_session.begin.assert_called_once()
-            # rollback_forに含まれないのでコミットを試みる
-            self.mock_session.commit.assert_called_once()
-            self.mock_session.rollback.assert_not_called()
-            self.mock_session.close.assert_called_once()
+        self.mock_session.begin.assert_called_once()
+        # rollback_forに含まれないのでコミットを試みる
+        self.mock_session.commit.assert_called_once()
+        self.mock_session.rollback.assert_not_called()
+        self.mock_session.close.assert_called_once()
 
     def test_no_rollback_for_takes_precedence(self):
         """Test that no_rollback_for takes precedence over rollback_for"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(
+            database=Database.TEST1,
+            rollback_for=(Exception,),
+            no_rollback_for=(KeyError,)
+        )
+        def test_method(self):
+            raise KeyError("test error")
 
-            @Transactional(
-                database=Database.TEST1,
-                rollback_for=(Exception,),
-                no_rollback_for=(KeyError,)
-            )
-            def test_method(self):
-                raise KeyError("test error")
+        instance = Mock()
 
-            instance = Mock()
+        # Act & Assert
+        with pytest.raises(KeyError):
+            test_method(instance)
 
-            # Act & Assert
-            with pytest.raises(KeyError):
-                test_method(instance)
-
-            self.mock_session.begin.assert_called_once()
-            # no_rollback_forが優先されるのでコミット
-            self.mock_session.commit.assert_called_once()
-            self.mock_session.rollback.assert_not_called()
-            self.mock_session.close.assert_called_once()
+        self.mock_session.begin.assert_called_once()
+        # no_rollback_forが優先されるのでコミット
+        self.mock_session.commit.assert_called_once()
+        self.mock_session.rollback.assert_not_called()
+        self.mock_session.close.assert_called_once()
 
     def test_session_closed_even_on_exception(self):
         """Test that session is closed even when exception occurs"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(database=Database.TEST1)
+        def test_method(self):
+            raise RuntimeError("test error")
 
-            @Transactional(database=Database.TEST1)
-            def test_method(self):
-                raise RuntimeError("test error")
+        instance = Mock()
 
-            instance = Mock()
+        # Act & Assert
+        with pytest.raises(RuntimeError):
+            test_method(instance)
 
-            # Act & Assert
-            with pytest.raises(RuntimeError):
-                test_method(instance)
-
-            # finallyブロックでクローズされる
-            self.mock_session.close.assert_called_once()
+        # finallyブロックでクローズされる
+        self.mock_session.close.assert_called_once()
 
     def test_read_only_parameter(self):
         """Test that read_only parameter is properly set"""
@@ -228,44 +219,38 @@ class TestTransactional:
         # Assert
         assert decorator.read_only is True
 
-    def test_decorator_with_test2_database(self):
+    def test_decorator_with_test2_database(self, setup_session_mocks):
         """Test decorator works with TEST2 database"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(database=Database.TEST2)
+        def test_method(self):
+            return "test2_result"
 
-            @Transactional(database=Database.TEST2)
-            def test_method(self):
-                return "test2_result"
+        instance = Mock()
 
-            instance = Mock()
+        # Act
+        result = test_method(instance)
 
-            # Act
-            result = test_method(instance)
-
-            # Assert
-            assert result == "test2_result"
-            mock_holder.get_session.assert_called_once_with('test2')
-            self.mock_session.commit.assert_called_once()
-            self.mock_session.close.assert_called_once()
+        # Assert
+        assert result == "test2_result"
+        setup_session_mocks.get_session.assert_called_once_with('test2')
+        self.mock_session.commit.assert_called_once()
+        self.mock_session.close.assert_called_once()
 
     def test_method_arguments_are_preserved(self):
         """Test that decorated method receives all arguments correctly"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(database=Database.TEST1)
+        def test_method(self, arg1, arg2, kwarg1=None):
+            return f"{arg1}-{arg2}-{kwarg1}"
 
-            @Transactional(database=Database.TEST1)
-            def test_method(self, arg1, arg2, kwarg1=None):
-                return f"{arg1}-{arg2}-{kwarg1}"
+        instance = Mock()
 
-            instance = Mock()
+        # Act
+        result = test_method(instance, "a", "b", kwarg1="c")
 
-            # Act
-            result = test_method(instance, "a", "b", kwarg1="c")
-
-            # Assert
-            assert result == "a-b-c"
+        # Assert
+        assert result == "a-b-c"
 
     def test_functools_wraps_preserves_metadata(self):
         """Test that functools.wraps preserves function metadata"""
@@ -282,74 +267,65 @@ class TestTransactional:
     def test_multiple_exceptions_in_rollback_for(self):
         """Test decorator with multiple exception types in rollback_for"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(
+            database=Database.TEST1,
+            rollback_for=(ValueError, TypeError, KeyError)
+        )
+        def test_method_value_error(self):
+            raise ValueError("test")
 
-            @Transactional(
-                database=Database.TEST1,
-                rollback_for=(ValueError, TypeError, KeyError)
-            )
-            def test_method_value_error(self):
-                raise ValueError("test")
+        @Transactional(
+            database=Database.TEST1,
+            rollback_for=(ValueError, TypeError, KeyError)
+        )
+        def test_method_type_error(self):
+            raise TypeError("test")
 
-            @Transactional(
-                database=Database.TEST1,
-                rollback_for=(ValueError, TypeError, KeyError)
-            )
-            def test_method_type_error(self):
-                raise TypeError("test")
+        instance = Mock()
 
-            instance = Mock()
+        # Act & Assert - ValueError
+        with pytest.raises(ValueError):
+            test_method_value_error(instance)
+        assert self.mock_session.rollback.call_count == 1
 
-            # Act & Assert - ValueError
-            with pytest.raises(ValueError):
-                test_method_value_error(instance)
-            assert self.mock_session.rollback.call_count == 1
+        # Reset mock
+        self.mock_session.reset_mock()
 
-            # Reset mock
-            self.mock_session.reset_mock()
-
-            # Act & Assert - TypeError
-            with pytest.raises(TypeError):
-                test_method_type_error(instance)
-            assert self.mock_session.rollback.call_count == 1
+        # Act & Assert - TypeError
+        with pytest.raises(TypeError):
+            test_method_type_error(instance)
+        assert self.mock_session.rollback.call_count == 1
 
     def test_default_rollback_for_catches_all_exceptions(self):
         """Test that default rollback_for=(Exception,) catches all exceptions"""
         # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
+        @Transactional(database=Database.TEST1)
+        def test_method(self):
+            raise RuntimeError("unexpected error")
 
-            @Transactional(database=Database.TEST1)
-            def test_method(self):
-                raise RuntimeError("unexpected error")
+        instance = Mock()
 
-            instance = Mock()
-
-            # Act & Assert
-            with pytest.raises(RuntimeError):
-                test_method(instance)
-
-            # デフォルトのrollback_for=(Exception,)ですべての例外でロールバック
-            self.mock_session.rollback.assert_called_once()
-
-    def test_session_holder_called_with_correct_database(self):
-        """Test that SessionHolder is called with correct database identifier"""
-        # Arrange
-        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
-            mock_holder.get_session.return_value = self.mock_session
-
-            @Transactional(database=Database.TEST1)
-            def test_method(self):
-                return "result"
-
-            instance = Mock()
-
-            # Act
+        # Act & Assert
+        with pytest.raises(RuntimeError):
             test_method(instance)
 
-            # Assert
-            mock_holder.get_session.assert_called_once_with('test1')
+        # デフォルトのrollback_for=(Exception,)ですべての例外でロールバック
+        self.mock_session.rollback.assert_called_once()
+
+    def test_session_holder_called_with_correct_database(self, setup_session_mocks):
+        """Test that SessionHolder is called with correct database identifier"""
+        # Arrange
+        @Transactional(database=Database.TEST1)
+        def test_method(self):
+            return "result"
+
+        instance = Mock()
+
+        # Act
+        test_method(instance)
+
+        # Assert
+        setup_session_mocks.get_session.assert_called_once_with('test1')
 
 
 if __name__ == "__main__":

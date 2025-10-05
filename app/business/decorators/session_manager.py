@@ -1,5 +1,6 @@
 import functools
 import logging
+import warnings
 from typing import Callable, Any, Union
 from sqlalchemy.orm import Session
 from app.business.decorators.database_enum import Database
@@ -12,6 +13,9 @@ class SessionManager:
     """
     Decorator for automatic session and transaction management
 
+    DEPRECATED: This decorator is deprecated in favor of the new @Transactional decorator.
+    Please use @Transactional instead for better control over transaction behavior.
+
     This decorator provides automatic transaction management for service methods.
     It eliminates the need for manual session handling in business logic.
 
@@ -21,12 +25,11 @@ class SessionManager:
     - Rolls back the transaction on error
     - Closes the session in all cases
 
-    Usage:
-        @SessionManager(database=Database.TEST1)
-        def some_method(self, input_dto: InDto) -> OutDto:
-            # Your business logic here
-            # Session is automatically managed
-            pass
+    Migration Guide:
+        OLD: @SessionManager(database=Database.TEST1)
+        NEW: @Transactional(database=Database.TEST1)
+
+    See app.business.decorators.transactional.Transactional for more details.
 
     Args:
         database: Database identifier (Database.TEST1 for user management,
@@ -50,12 +53,23 @@ class SessionManager:
         """
         Initialize SessionManager decorator
 
+        DEPRECATED: Use @Transactional decorator instead.
+
         Args:
             database: Database identifier (Database enum or string 'test1'/'test2')
 
         Raises:
             ValueError: If database name is invalid
         """
+        # Deprecation警告を発する
+        warnings.warn(
+            "SessionManager is deprecated and will be removed in a future version. "
+            "Please use @Transactional decorator instead for better transaction control. "
+            "See app.business.decorators.transactional.Transactional for migration guide.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
         # 文字列の場合はEnumに変換を試みる
         if isinstance(database, str):
             try:

@@ -28,6 +28,37 @@ class Transactional:
     - Rolls back on specified exceptions
     - Closes the session in all cases (finally block)
 
+    IMPORTANT - no_rollback_for behavior:
+        When an exception in no_rollback_for occurs, the decorator will:
+        1. COMMIT the transaction (preserving database changes)
+        2. RE-RAISE the exception to the caller
+
+        This allows business logic to handle "expected" exceptions while
+        preserving partial database changes. Use with caution.
+
+        Example:
+            @Transactional(
+                database=Database.TEST1,
+                rollback_for=(Exception,),
+                no_rollback_for=(KeyError,)
+            )
+            def process_optional_data(self, dto):
+                self.repository.save_required_data(dto.required)  # This commits
+                self.repository.save_optional_data(dto.optional)  # May raise KeyError
+
+            # Result: required_data is committed, KeyError propagates to caller
+
+    IMPORTANT - read_only parameter:
+        Currently used for logging and documentation purposes only.
+        SQLAlchemy does not have explicit read-only transaction support.
+
+        Future enhancements may include:
+        - Using read-only database connections
+        - Disabling flush operations
+        - Optimizing query execution plans
+
+        For now, treat this as a hint for developers and future optimization.
+
     Usage:
         @Transactional(database=Database.TEST1)
         def create_user(self, input_dto: CreateUserDto) -> UserDto:
@@ -37,7 +68,7 @@ class Transactional:
 
         @Transactional(database=Database.TEST1, read_only=True)
         def get_users(self, input_dto: GetUsersDto) -> List[UserDto]:
-            # Read-only transaction (optimization hint)
+            # Read-only transaction (optimization hint for future use)
             pass
 
         @Transactional(
@@ -47,22 +78,22 @@ class Transactional:
         )
         def process_data(self, dto: DataDto) -> ResultDto:
             # Rolls back only for ValueError and TypeError
-            # KeyError will not trigger rollback
+            # KeyError commits changes but still propagates exception
             pass
 
     Args:
         database: Database identifier (Database.TEST1 or Database.TEST2)
-        read_only: If True, marks transaction as read-only (optimization hint)
+        read_only: If True, marks transaction as read-only (currently logging only)
         rollback_for: Tuple of exception types that trigger rollback
         no_rollback_for: Tuple of exception types that should NOT trigger rollback
-                        (takes precedence over rollback_for)
+                        (takes precedence over rollback_for; commits but re-raises)
 
     Raises:
         ValueError: If an invalid database name is provided
         TypeError: If database parameter has invalid type
 
     Comparison with SessionManager:
-    - SessionManager: Simple automatic session/transaction management
+    - SessionManager: Simple automatic session/transaction management (deprecated)
     - Transactional: Spring-like declarative transaction control with custom rules
 
     Example:
@@ -78,7 +109,7 @@ class Transactional:
 
             @Transactional(database=Database.TEST1, read_only=True)
             def get_all_users(self) -> List[UserDto]:
-                # Read-only optimization hint
+                # Read-only hint (future optimization)
                 return self.user_repository.get_all()
     """
 
@@ -93,10 +124,14 @@ class Transactional:
         Initialize Transactional decorator
 
         Args:
-            database: Database identifier (Database enum or string 'test1'/'test2')
-            read_only: If True, transaction is read-only (optimization hint)
+            database: Database identifier
+                     RECOMMENDED: Use Database.TEST1 or Database.TEST2 enum
+                     LEGACY: String 'test1' or 'test2' (for backward compatibility)
+            read_only: If True, marks transaction as read-only
+                      NOTE: Currently used for logging only, not enforced by SQLAlchemy
             rollback_for: Exception types that trigger rollback (default: all Exception)
             no_rollback_for: Exception types that should NOT trigger rollback
+                            WARNING: Commits transaction but re-raises exception
 
         Raises:
             ValueError: If database name is invalid
@@ -231,7 +266,11 @@ class Transactional:
                 # ロールバック判定
                 if session and self._should_rollback(e):
                     session.rollback()
-                    logger.warning(
+                    # rollback_forに含まれる例外は想定内のロールバック（INFO）
+                    # それ以外は予期しないロールバック（WARNING）
+                    log_level = logging.INFO if isinstance(e, self.rollback_for) else logging.WARNING
+                    logger.log(
+                        log_level,
                         f"Transaction rolled back due to {type(e).__name__} "
                         f"for {self.database.value} (method: {func.__name__}): {str(e)}"
                     )
