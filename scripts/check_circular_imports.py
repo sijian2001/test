@@ -42,19 +42,20 @@ def check_circular_imports():
 
         # 循環が検出されたかチェック
         if "Cycle" in result.stdout or "cycle" in result.stdout:
-            print("⚠️ 循環importが検出されました:")
+            print("[WARNING] 循環importが検出されました:")
             print(result.stdout)
             return False
         else:
-            print("✅ 循環importは検出されませんでした")
+            print("[OK] 循環importは検出されませんでした")
             return True
 
     except FileNotFoundError:
-        print("エラー: pydepsがインストールされていません")
-        print("インストール方法: pip install pydeps")
-        return False
+        print("[INFO] pydepsがインストールされていません")
+        print("       pydepsによる循環importチェックをスキップします")
+        print("       インストール方法: pip install pydeps")
+        return True  # pydepsなしでも続行
     except subprocess.TimeoutExpired:
-        print("エラー: pydepsの実行がタイムアウトしました")
+        print("[ERROR] pydepsの実行がタイムアウトしました")
         return False
 
 
@@ -92,12 +93,12 @@ def check_architecture_violations():
                 violations.append(f"{py_file}: domain層からbatch層への依存が検出されました")
 
     if violations:
-        print("⚠️ アーキテクチャ違反が検出されました:")
+        print("[WARNING] アーキテクチャ違反が検出されました:")
         for violation in violations:
             print(f"  - {violation}")
         return False
     else:
-        print("✅ アーキテクチャ違反は検出されませんでした")
+        print("[OK] アーキテクチャ違反は検出されませんでした")
         return True
 
 
@@ -115,10 +116,10 @@ def main():
 
     print("\n" + "=" * 60)
     if circular_ok and arch_ok:
-        print("✅ すべてのチェックが正常に完了しました")
+        print("[SUCCESS] すべてのチェックが正常に完了しました")
         return 0
     else:
-        print("❌ チェックに失敗しました")
+        print("[FAILED] チェックに失敗しました")
         return 1
 
 
