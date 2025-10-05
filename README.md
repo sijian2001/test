@@ -61,6 +61,24 @@ setup.bat
    pip install -r requirements.txt
    ```
 
+4. **パッケージとしてインストール（推奨）**
+   ```bash
+   # 通常インストール
+   pip install -e .
+
+   # 開発用依存関係も含めてインストール
+   pip install -e ".[dev]"
+   ```
+
+   インストール後、以下のコマンドが使用可能になります:
+   ```bash
+   csv-import          # ユーザー・部署CSVインポート
+   csv-export          # ユーザー情報CSVエクスポート
+   categories-import   # カテゴリCSVインポート
+   products-import     # 商品CSVインポート
+   product-info-export # 商品情報CSVエクスポート
+   ```
+
 ### 仮想環境の使用
 
 - **有効化**: 開発開始時に実行
@@ -127,29 +145,29 @@ LEFT JOIN department d ON u.department_id = d.department_id;
 
 #### CSV インポート処理
 ```bash
-python batch/csv_import_main.py
+python app/batch/csv_import_main.py
 ```
 
 #### CSV エクスポート処理（ユーザー情報抽出）
 ```bash
-python batch/csv_export_main.py
+python app/batch/csv_export_main.py
 ```
 
 ### test2データベース（商品管理システム）
 
 #### カテゴリCSV インポート処理
 ```bash
-python batch/categories_import_main.py
+python app/batch/categories_import_main.py
 ```
 
 #### 商品CSV インポート処理
 ```bash
-python batch/products_import_main.py
+python app/batch/products_import_main.py
 ```
 
 #### 商品情報CSV エクスポート処理
 ```bash
-python batch/product_info_export_main.py
+python app/batch/product_info_export_main.py
 ```
 
 ### 単体テスト実行
@@ -174,51 +192,54 @@ python -m pytest tests/business/test_category_regist_service.py -v
 
 ```
 .
-├── batch/                                          # バッチ処理関連
-│   ├── categories_csv_import_processor.py         # カテゴリCSV取込処理
-│   ├── categories_import_main.py                  # カテゴリ取込メインプログラム
-│   ├── csv_export_batch_processor.py             # CSV出力バッチ処理
-│   ├── csv_export_main.py                         # ユーザー情報出力メインプログラム
-│   ├── csv_export_processor.py                   # CSV出力処理
-│   ├── csv_import_main.py                         # ユーザー取込メインプログラム
-│   ├── csv_import_processor.py                   # CSV取込処理
-│   ├── data_batch_processor.py                   # データバッチ処理
-│   ├── main.py                                    # 共通メインプログラム
-│   ├── processor.py                              # 処理基底クラス
-│   ├── product_info_csv_export_processor.py      # 商品情報CSV出力処理
-│   ├── product_info_export_main.py                # 商品情報出力メインプログラム
-│   ├── products_csv_import_processor.py          # 商品CSV取込処理
-│   └── products_import_main.py                    # 商品取込メインプログラム
-├── business/                                       # ビジネスロジック
-│   ├── decorators/                                # デコレータ
-│   │   └── session_manager.py                    # セッション管理デコレータ
-│   ├── abstract_service.py                       # サービス抽象クラス
-│   ├── category_regist_service.py                # カテゴリ登録サービス
-│   ├── csv_export_service.py                     # CSV出力サービス
-│   ├── department_regist_service.py              # 部署登録サービス
-│   ├── depart_user_regist_service.py             # 部署ユーザー登録サービス
-│   ├── product_info_service.py                   # 商品情報サービス
-│   ├── product_regist_service.py                 # 商品登録サービス
-│   ├── user_info_service.py                      # ユーザー情報サービス
-│   └── user_regist_service.py                    # ユーザー登録サービス
-├── domain/                                         # ドメインモデル・リポジトリ
-│   ├── model/                                     # データモデル（未使用）
-│   ├── repository/                                # リポジトリ
-│   │   ├── test1/                                 # test1データベース用
-│   │   │   ├── department_repository.py          # 部署リポジトリ
-│   │   │   ├── user_info_repository.py           # ユーザー情報リポジトリ
-│   │   │   └── user_repository.py                # ユーザーリポジトリ
-│   │   └── test2/                                 # test2データベース用
-│   │       ├── category_repository.py            # カテゴリリポジトリ
-│   │       ├── product_info_repository.py        # 商品情報リポジトリ
-│   │       └── product_repository.py             # 商品リポジトリ
-│   ├── vo/                                        # バリューオブジェクト
-│   │   ├── category_vo.py                        # カテゴリVO
-│   │   ├── department_vo.py                      # 部署VO
-│   │   ├── product_info_vo.py                    # 商品情報VO
-│   │   ├── product_vo.py                         # 商品VO
-│   │   └── user_vo.py                            # ユーザーVO
-│   └── database.py                                # データベース接続
+├── app/                                            # アプリケーションコード
+│   ├── batch/                                      # バッチ処理関連
+│   │   ├── categories_csv_import_processor.py     # カテゴリCSV取込処理
+│   │   ├── categories_import_main.py              # カテゴリ取込メインプログラム
+│   │   ├── csv_export_batch_processor.py         # CSV出力バッチ処理
+│   │   ├── csv_export_main.py                     # ユーザー情報出力メインプログラム
+│   │   ├── csv_export_processor.py               # CSV出力処理
+│   │   ├── csv_import_main.py                     # ユーザー取込メインプログラム
+│   │   ├── csv_import_processor.py               # CSV取込処理
+│   │   ├── data_batch_processor.py               # データバッチ処理
+│   │   ├── main.py                                # 共通メインプログラム
+│   │   ├── processor.py                          # 処理基底クラス
+│   │   ├── product_info_csv_export_processor.py  # 商品情報CSV出力処理
+│   │   ├── product_info_export_main.py            # 商品情報出力メインプログラム
+│   │   ├── products_csv_import_processor.py      # 商品CSV取込処理
+│   │   └── products_import_main.py                # 商品取込メインプログラム
+│   ├── business/                                   # ビジネスロジック
+│   │   ├── decorators/                            # デコレータ
+│   │   │   └── session_manager.py                # セッション管理デコレータ
+│   │   ├── abstract_service.py                   # サービス抽象クラス
+│   │   ├── category_regist_service.py            # カテゴリ登録サービス
+│   │   ├── csv_export_service.py                 # CSV出力サービス
+│   │   ├── department_regist_service.py          # 部署登録サービス
+│   │   ├── depart_user_regist_service.py         # 部署ユーザー登録サービス
+│   │   ├── product_info_service.py               # 商品情報サービス
+│   │   ├── product_regist_service.py             # 商品登録サービス
+│   │   ├── user_info_service.py                  # ユーザー情報サービス
+│   │   └── user_regist_service.py                # ユーザー登録サービス
+│   ├── domain/                                     # ドメインモデル・リポジトリ
+│   │   ├── model/                                 # データモデル（未使用）
+│   │   ├── repository/                            # リポジトリ
+│   │   │   ├── test1/                             # test1データベース用
+│   │   │   │   ├── department_repository.py      # 部署リポジトリ
+│   │   │   │   ├── user_info_repository.py       # ユーザー情報リポジトリ
+│   │   │   │   └── user_repository.py            # ユーザーリポジトリ
+│   │   │   └── test2/                             # test2データベース用
+│   │   │       ├── category_repository.py        # カテゴリリポジトリ
+│   │   │       ├── product_info_repository.py    # 商品情報リポジトリ
+│   │   │       └── product_repository.py         # 商品リポジトリ
+│   │   ├── vo/                                    # バリューオブジェクト
+│   │   │   ├── category_vo.py                    # カテゴリVO
+│   │   │   ├── department_vo.py                  # 部署VO
+│   │   │   ├── product_info_vo.py                # 商品情報VO
+│   │   │   ├── product_vo.py                     # 商品VO
+│   │   │   └── user_vo.py                        # ユーザーVO
+│   │   └── database.py                            # データベース接続
+│   └── utils/                                      # ユーティリティ
+│       └── logger_utils.py                        # ロガーユーティリティ
 ├── sql/                                            # SQLファイル
 │   ├── create_db_user.sql                        # DB・ユーザー作成
 │   ├── create_department_table.sql               # 部署テーブル作成
@@ -251,11 +272,15 @@ python -m pytest tests/business/test_category_regist_service.py -v
 │   ├── product_report.csv                        # 商品情報出力
 │   ├── report.csv                                # ユーザー情報出力
 │   └── user.csv                                  # ユーザーCSVサンプル
+├── scripts/                                        # ユーティリティスクリプト
+│   └── check_circular_imports.py                  # 循環importチェック
 ├── db.yaml                                         # データベース設定
 ├── logger.yaml                                     # ロガー設定
+├── pyproject.toml                                  # パッケージ設定
 ├── requirements.txt                                # Python依存関係
 ├── setup.bat                                       # Windows環境セットアップ
 ├── setup.sh                                       # Linux/macOS環境セットアップ
+├── MIGRATION.md                                    # 移行ガイド
 └── README.md                                      # このファイル
 ```
 
@@ -289,3 +314,21 @@ python -m pytest tests/business/test_category_regist_service.py -v
 - **モック使用**: 外部依存の分離テスト
 - **例外処理テスト**: 異常系シナリオのカバー
 - **マルチデータベーステスト**: test1/test2両システムのテスト
+
+## 開発ツール
+
+### 循環importチェック
+プロジェクトの依存関係の健全性を確認するツールを提供しています。
+
+```bash
+# 循環importとアーキテクチャ違反をチェック
+python scripts/check_circular_imports.py
+```
+
+このツールは以下をチェックします:
+- 循環import（相互依存）の検出
+- アーキテクチャ違反（例: domain層からbusiness層への依存）の検出
+
+## 移行ガイド
+
+ソースフォルダ構造の変更に関する詳細な移行ガイドは、[MIGRATION.md](MIGRATION.md)を参照してください。

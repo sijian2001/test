@@ -7,8 +7,8 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from domain.repository.test1.user_repository import UserRepository
-from domain.model.test1.user import User
+from app.domain.repository.test1.user_repository import UserRepository
+from app.domain.model.test1.user import User
 from sqlalchemy.orm import Session
 
 
@@ -121,7 +121,7 @@ class TestUserRepository:
         self.mock_session.refresh = Mock()
 
         # Act
-        with patch('domain.repository.test1.user_repository.User') as mock_user_class:
+        with patch('app.domain.repository.test1.user_repository.User') as mock_user_class:
             mock_user_class.return_value = mock_user
             result = self.repository.create_user(username, email, password_hash, first_name, last_name, department_id)
 
@@ -153,7 +153,7 @@ class TestUserRepository:
         self.mock_session.refresh = Mock()
 
         # Act
-        with patch('domain.repository.test1.user_repository.User') as mock_user_class:
+        with patch('app.domain.repository.test1.user_repository.User') as mock_user_class:
             mock_user_class.return_value = mock_user
             result = self.repository.create_user(username, email, password_hash)
 
@@ -270,7 +270,7 @@ class TestUserRepository:
         self.repository.get_all_users()
         self.repository.get_user_by_id(1)
 
-        with patch('domain.repository.test1.user_repository.User') as mock_user_class:
+        with patch('app.domain.repository.test1.user_repository.User') as mock_user_class:
             mock_user_class.return_value = Mock()
             self.repository.create_user("test", "test@email.com", "hash")
 

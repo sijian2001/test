@@ -7,8 +7,8 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from domain.repository.test1.user_info_repository import UserInfoRepository
-from domain.model.test1.user_info import UserInfo
+from app.domain.repository.test1.user_info_repository import UserInfoRepository
+from app.domain.model.test1.user_info import UserInfo
 from sqlalchemy.orm import Session
 
 

@@ -60,6 +60,20 @@ coverage.xml
 
 # Logs
 *.log
+logs/
+
+# Generated CSV files
+work/*.csv
+
+# pydeps generated files
+*.svg
+*.png
+*.dot
+
+# Claude Code configuration (個人用設定)
+.claude/
+.serena/
+.mcp.json
 
 # OS generated files
 .DS_Store

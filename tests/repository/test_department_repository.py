@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from domain.repository.test1.department_repository import DepartmentRepository
-from domain.model.test1.department import Department
+from app.domain.repository.test1.department_repository import DepartmentRepository
+from app.domain.model.test1.department import Department
 
 
 class TestDepartmentRepository:
@@ -115,7 +115,7 @@ class TestDepartmentRepository:
         self.mock_session.refresh = Mock()
 
         # Act
-        with patch('domain.repository.test1.department_repository.Department') as mock_dept_class:
+        with patch('app.domain.repository.test1.department_repository.Department') as mock_dept_class:
             mock_dept_class.return_value = mock_department
             result = self.repository.create_department(name, description, manager_id)
 
@@ -142,7 +142,7 @@ class TestDepartmentRepository:
         self.mock_session.refresh = Mock()
 
         # Act
-        with patch('domain.repository.test1.department_repository.Department') as mock_dept_class:
+        with patch('app.domain.repository.test1.department_repository.Department') as mock_dept_class:
             mock_dept_class.return_value = mock_department
             result = self.repository.create_department(name)
 
@@ -323,7 +323,7 @@ class TestDepartmentRepository:
         self.repository.get_all_departments()
         self.repository.get_department_by_id(1)
 
-        with patch('domain.repository.test1.department_repository.Department') as mock_dept_class:
+        with patch('app.domain.repository.test1.department_repository.Department') as mock_dept_class:
             mock_dept_class.return_value = Mock()
             self.repository.create_department("Test")
 

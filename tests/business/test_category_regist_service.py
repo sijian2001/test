@@ -7,11 +7,11 @@ import os
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from business.category_regist_service import CategoryRegistService, CategoryRegistInDto, CategoryRegistOutDto
-from domain.repository.test2.category_repository import CategoryRepository
-from domain.model.test2.category import Category
-from business.vo.category_vo import CategoryVo
-from domain.session_holder import SessionHolder
+from app.business.category_regist_service import CategoryRegistService, CategoryRegistInDto, CategoryRegistOutDto
+from app.domain.repository.test2.category_repository import CategoryRepository
+from app.domain.model.test2.category import Category
+from app.business.vo.category_vo import CategoryVo
+from app.domain.session_holder import SessionHolder
 
 
 class TestCategoryRegistService:
@@ -238,7 +238,7 @@ class TestCategoryRegistService:
         self.service.__post_init__()
         assert hasattr(self.service, 'logger')
 
-    @patch('business.category_regist_service.logging.getLogger')
+    @patch('app.business.category_regist_service.logging.getLogger')
     def test_logging_calls_success(self, mock_get_logger):
         """Test that appropriate logging calls are made for successful registration"""
         # Arrange
@@ -260,7 +260,7 @@ class TestCategoryRegistService:
         # Should have at least: start, per-category, count, and completion messages
         assert mock_logger.info.call_count >= 4
 
-    @patch('business.category_regist_service.logging.getLogger')
+    @patch('app.business.category_regist_service.logging.getLogger')
     def test_logging_calls_failure(self, mock_get_logger):
         """Test that appropriate logging calls are made for failed registration"""
         # Arrange

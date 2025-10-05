@@ -12,7 +12,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from utils.logger_utils import (
+from app.utils.logger_utils import (
     load_logger_config,
     _create_logger_handler,
     _create_file_handler,
@@ -185,7 +185,7 @@ class TestSetupInjectorLogging:
 
     def test_setup_injector_logging_without_config(self):
         """Test setup without config (uses defaults)"""
-        with patch('utils.logger_utils.load_logger_config', return_value=None):
+        with patch('app.utils.logger_utils.load_logger_config', return_value=None):
             setup_injector_logging()
 
             injector_logger = logging.getLogger('injector')
@@ -237,7 +237,7 @@ class TestSetupSQLAlchemyLogging:
 
     def test_setup_sqlalchemy_logging_without_config(self):
         """Test setup without config (uses defaults)"""
-        with patch('utils.logger_utils.load_logger_config', return_value=None):
+        with patch('app.utils.logger_utils.load_logger_config', return_value=None):
             setup_sqlalchemy_logging()
 
             engine_logger = logging.getLogger('sqlalchemy.engine')
@@ -305,7 +305,7 @@ class TestSetupFileLogging:
 
     def test_setup_file_logging_no_config(self):
         """Test setup without file configuration"""
-        with patch('utils.logger_utils.load_logger_config', return_value=None):
+        with patch('app.utils.logger_utils.load_logger_config', return_value=None):
             setup_file_logging()
 
             root_logger = logging.getLogger()
@@ -330,7 +330,7 @@ class TestSetupApplicationLogging:
 
     def test_setup_application_logging_no_config(self):
         """Test setup without valid configuration"""
-        with patch('utils.logger_utils.load_logger_config', return_value=None):
+        with patch('app.utils.logger_utils.load_logger_config', return_value=None):
             setup_application_logging()
 
             # No loggers should be set up

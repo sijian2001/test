@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "batch-processing-app"
+version = "0.1.0"
+description = "Python batch processing application with dual database support (test1 and test2)"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "Development Team"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "SQLAlchemy>=2.0.0",
+    "PyMySQL>=1.0.0",
+    "PyYAML>=6.0",
+    "injector>=0.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-mock>=3.10.0",
+    "pydeps>=1.12.0",  # 循環import検出用
+]
+
+[project.scripts]
+# ユーザー管理システム (test1データベース)
+csv-import = "app.batch.csv_import_main:main"
+csv-export = "app.batch.csv_export_main:main"
+
+# 商品管理システム (test2データベース)
+categories-import = "app.batch.categories_import_main:main"
+products-import = "app.batch.products_import_main:main"
+product-info-export = "app.batch.product_info_export_main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.pydeps]
+# 循環import検出設定
+max_bacon = 2
+cluster = true

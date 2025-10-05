@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock, MagicMock, patch
-from business.decorators.session_manager import SessionManager
-from business.decorators.database_enum import Database
-from domain.session_holder import SessionHolder
+from app.business.decorators.session_manager import SessionManager
+from app.business.decorators.database_enum import Database
+from app.domain.session_holder import SessionHolder
 
 
 class TestSessionManager:

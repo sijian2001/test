@@ -9,9 +9,9 @@ from datetime import datetime
 # Add the project root directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from batch.product_info_csv_export_processor import ProductInfoCsvExportProcessorImpl
-from business.product_info_service import ProductInfoService, ProductInfoSearchInDto, ProductInfoOutDto
-from domain.model.test2.product_info import ProductInfo
+from app.batch.product_info_csv_export_processor import ProductInfoCsvExportProcessorImpl
+from app.business.product_info_service import ProductInfoService, ProductInfoSearchInDto, ProductInfoOutDto
+from app.domain.model.test2.product_info import ProductInfo
 
 
 class TestProductInfoCsvExportProcessor:
@@ -59,9 +59,9 @@ class TestProductInfoCsvExportProcessor:
 
         return product_info
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_success(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process with successful execution"""
         # Arrange
@@ -89,9 +89,9 @@ class TestProductInfoCsvExportProcessor:
         mock_file.assert_called_once_with(os.path.join("work", "product_info_report.csv"), 'w', newline='', encoding='utf-8')
         mock_makedirs.assert_not_called()  # Directory exists, so makedirs not called
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_creates_directory(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process creates work directory when it doesn't exist"""
         # Arrange
@@ -108,9 +108,9 @@ class TestProductInfoCsvExportProcessor:
         mock_makedirs.assert_called_once_with("work")
         mock_file.assert_called_once()
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_empty_data(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process with empty product info data"""
         # Arrange
@@ -126,9 +126,9 @@ class TestProductInfoCsvExportProcessor:
         self.mock_product_info_service.search_product_info.assert_called_once()
         mock_file.assert_called_once()
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_handles_null_values(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process handles null/None values correctly"""
         # Arrange
@@ -150,7 +150,7 @@ class TestProductInfoCsvExportProcessor:
         self.mock_product_info_service.search_product_info.return_value = mock_result
 
         # Mock the csv.DictWriter to capture written rows
-        with patch('batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
+        with patch('app.batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
             mock_writer = Mock()
             mock_dict_writer.return_value = mock_writer
 
@@ -174,9 +174,9 @@ class TestProductInfoCsvExportProcessor:
             assert written_row['created_at'] == ''  # None should become empty string
             assert written_row['updated_at'] == ''  # None should become empty string
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_csv_headers(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process writes correct CSV headers"""
         # Arrange
@@ -185,7 +185,7 @@ class TestProductInfoCsvExportProcessor:
         self.mock_product_info_service.search_product_info.return_value = mock_result
 
         # Mock the csv.DictWriter to capture header writing
-        with patch('batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
+        with patch('app.batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
             mock_writer = Mock()
             mock_dict_writer.return_value = mock_writer
 
@@ -219,9 +219,9 @@ class TestProductInfoCsvExportProcessor:
         assert result is False
         self.mock_product_info_service.search_product_info.assert_called_once()
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', side_effect=IOError("File write error"))
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', side_effect=IOError("File write error"))
     def test_run_csv_export_process_file_exception(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process handles file I/O exceptions"""
         # Arrange
@@ -235,8 +235,8 @@ class TestProductInfoCsvExportProcessor:
         # Assert
         assert result is False
 
-    @patch('batch.product_info_csv_export_processor.os.makedirs', side_effect=OSError("Permission denied"))
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs', side_effect=OSError("Permission denied"))
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
     def test_run_csv_export_process_directory_creation_exception(self, mock_exists, mock_makedirs):
         """Test run_csv_export_process handles directory creation exceptions"""
         # Arrange
@@ -251,9 +251,9 @@ class TestProductInfoCsvExportProcessor:
         assert result is False
         mock_makedirs.assert_called_once_with("work")
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_datetime_formatting(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process formats datetime correctly"""
         # Arrange
@@ -281,7 +281,7 @@ class TestProductInfoCsvExportProcessor:
         mock_result = ProductInfoOutDto(product_info_list=[product_info], total_count=1)
         self.mock_product_info_service.search_product_info.return_value = mock_result
 
-        with patch('batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
+        with patch('app.batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
             mock_writer = Mock()
             mock_dict_writer.return_value = mock_writer
 
@@ -298,9 +298,9 @@ class TestProductInfoCsvExportProcessor:
             assert written_row['created_at'] == "2025-09-17 17:47:03"
             assert written_row['updated_at'] == "2025-09-17 17:47:03"
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_output_file_path(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process uses correct output file path"""
         # Arrange
@@ -316,9 +316,9 @@ class TestProductInfoCsvExportProcessor:
         expected_path = os.path.join("work", "product_info_report.csv")
         mock_file.assert_called_once_with(expected_path, 'w', newline='', encoding='utf-8')
 
-    @patch('batch.product_info_csv_export_processor.os.path.exists')
-    @patch('batch.product_info_csv_export_processor.os.makedirs')
-    @patch('batch.product_info_csv_export_processor.open', new_callable=mock_open)
+    @patch('app.batch.product_info_csv_export_processor.os.path.exists')
+    @patch('app.batch.product_info_csv_export_processor.os.makedirs')
+    @patch('app.batch.product_info_csv_export_processor.open', new_callable=mock_open)
     def test_run_csv_export_process_price_conversion(self, mock_file, mock_makedirs, mock_exists):
         """Test run_csv_export_process converts price to float correctly"""
         # Arrange
@@ -339,7 +339,7 @@ class TestProductInfoCsvExportProcessor:
         mock_result = ProductInfoOutDto(product_info_list=[product_info], total_count=1)
         self.mock_product_info_service.search_product_info.return_value = mock_result
 
-        with patch('batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
+        with patch('app.batch.product_info_csv_export_processor.csv.DictWriter') as mock_dict_writer:
             mock_writer = Mock()
             mock_dict_writer.return_value = mock_writer
 
@@ -358,7 +358,7 @@ class TestProductInfoCsvExportProcessor:
         self.processor.__post_init__()
         assert hasattr(self.processor, 'logger')
 
-    @patch('batch.product_info_csv_export_processor.logging.getLogger')
+    @patch('app.batch.product_info_csv_export_processor.logging.getLogger')
     def test_logging_calls(self, mock_get_logger):
         """Test that appropriate logging calls are made"""
         # Arrange
@@ -368,8 +368,8 @@ class TestProductInfoCsvExportProcessor:
         mock_result = ProductInfoOutDto(product_info_list=[], total_count=0)
         self.mock_product_info_service.search_product_info.return_value = mock_result
 
-        with patch('batch.product_info_csv_export_processor.open', mock_open()):
-            with patch('batch.product_info_csv_export_processor.os.path.exists', return_value=True):
+        with patch('app.batch.product_info_csv_export_processor.open', mock_open()):
+            with patch('app.batch.product_info_csv_export_processor.os.path.exists', return_value=True):
                 # Act
                 self.processor.run_csv_export_process()
 
