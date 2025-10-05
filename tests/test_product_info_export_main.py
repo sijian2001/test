@@ -252,42 +252,87 @@ class TestSetupApplicationLogging:
             test_logger = logging.getLogger(logger_name)
             test_logger.handlers.clear()
 
-    def test_setup_application_logging_no_env_vars(self):
-        """Test setup without environment variables"""
-        with patch.dict(os.environ, {}, clear=True):
-            with patch('utils.logger_utils.load_logger_config', return_value=None):
-                setup_application_logging()
+    def test_setup_application_logging_no_config(self):
+        """Test setup without valid configuration"""
+        with patch('utils.logger_utils.load_logger_config', return_value=None):
+            setup_application_logging()
 
-                # No loggers should be set up
-                injector_logger = logging.getLogger('injector')
-                assert len(injector_logger.handlers) == 0
+            # No loggers should be set up
+            injector_logger = logging.getLogger('injector')
+            assert len(injector_logger.handlers) == 0
 
-    def test_setup_application_logging_with_debug_injector(self):
-        """Test setup with DEBUG_INJECTOR=true"""
-        with patch.dict(os.environ, {'DEBUG_INJECTOR': 'true'}):
-            with patch('utils.logger_utils.load_logger_config', return_value=None):
-                setup_application_logging()
+    def test_setup_application_logging_disabled(self):
+        """Test setup with enable=false in config"""
+        config = {
+            'logger': {
+                'injector': {'enable': False},
+                'sqlalchemy': {'enable': False}
+            }
+        }
+        setup_application_logging(config)
 
-                injector_logger = logging.getLogger('injector')
-                assert len(injector_logger.handlers) > 0
+        injector_logger = logging.getLogger('injector')
+        engine_logger = logging.getLogger('sqlalchemy.engine')
 
-    def test_setup_application_logging_with_debug_sql(self):
-        """Test setup with DEBUG_SQL=true"""
-        with patch.dict(os.environ, {'DEBUG_SQL': 'true'}):
-            with patch('utils.logger_utils.load_logger_config', return_value=None):
-                setup_application_logging()
+        assert len(injector_logger.handlers) == 0
+        assert len(engine_logger.handlers) == 0
 
-                engine_logger = logging.getLogger('sqlalchemy.engine')
-                assert len(engine_logger.handlers) > 0
+    def test_setup_application_logging_injector_enabled(self):
+        """Test setup with injector.enable=true"""
+        config = {
+            'logger': {
+                'injector': {
+                    'enable': True,
+                    'level': 'DEBUG',
+                    'format': '%(message)s'
+                },
+                'sqlalchemy': {'enable': False}
+            }
+        }
+        setup_application_logging(config)
 
-    def test_setup_application_logging_with_both_env_vars(self):
-        """Test setup with both environment variables"""
-        with patch.dict(os.environ, {'DEBUG_INJECTOR': 'true', 'DEBUG_SQL': 'true'}):
-            with patch('utils.logger_utils.load_logger_config', return_value=None):
-                setup_application_logging()
+        injector_logger = logging.getLogger('injector')
+        assert len(injector_logger.handlers) > 0
 
-                injector_logger = logging.getLogger('injector')
-                engine_logger = logging.getLogger('sqlalchemy.engine')
+    def test_setup_application_logging_sqlalchemy_enabled(self):
+        """Test setup with sqlalchemy.enable=true"""
+        config = {
+            'logger': {
+                'injector': {'enable': False},
+                'sqlalchemy': {
+                    'enable': True,
+                    'format': '%(message)s',
+                    'engine': {'level': 'INFO'},
+                    'pool': {'level': 'DEBUG'}
+                }
+            }
+        }
+        setup_application_logging(config)
 
-                assert len(injector_logger.handlers) > 0
-                assert len(engine_logger.handlers) > 0
+        engine_logger = logging.getLogger('sqlalchemy.engine')
+        assert len(engine_logger.handlers) > 0
+
+    def test_setup_application_logging_both_enabled(self):
+        """Test setup with both loggers enabled"""
+        config = {
+            'logger': {
+                'injector': {
+                    'enable': True,
+                    'level': 'DEBUG',
+                    'format': '%(message)s'
+                },
+                'sqlalchemy': {
+                    'enable': True,
+                    'format': '%(message)s',
+                    'engine': {'level': 'INFO'},
+                    'pool': {'level': 'DEBUG'}
+                }
+            }
+        }
+        setup_application_logging(config)
+
+        injector_logger = logging.getLogger('injector')
+        engine_logger = logging.getLogger('sqlalchemy.engine')
+
+        assert len(injector_logger.handlers) > 0
+        assert len(engine_logger.handlers) > 0

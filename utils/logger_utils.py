@@ -127,7 +127,7 @@ def setup_sqlalchemy_logging(config=None):
 
 def setup_application_logging(logger_config=None):
     """
-    Setup application logging based on environment variables
+    Setup application logging based on logger.yaml configuration
 
     Args:
         logger_config: Pre-loaded logger configuration (optional)
@@ -136,10 +136,15 @@ def setup_application_logging(logger_config=None):
     if logger_config is None:
         logger_config = load_logger_config()
 
-    # Enable injector logging if DEBUG_INJECTOR environment variable is set
-    if os.getenv('DEBUG_INJECTOR', 'false').lower() == 'true':
+    # Check if logger_config is valid
+    if not logger_config or 'logger' not in logger_config:
+        logger.debug("No valid logger configuration found, skipping logging setup")
+        return
+
+    # Enable injector logging if configured
+    if logger_config['logger'].get('injector', {}).get('enable', False):
         setup_injector_logging(logger_config)
 
-    # Enable SQLAlchemy logging if DEBUG_SQL environment variable is set
-    if os.getenv('DEBUG_SQL', 'false').lower() == 'true':
+    # Enable SQLAlchemy logging if configured
+    if logger_config['logger'].get('sqlalchemy', {}).get('enable', False):
         setup_sqlalchemy_logging(logger_config)

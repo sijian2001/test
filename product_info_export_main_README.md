@@ -6,7 +6,7 @@ The `product_info_export_main.py` script supports detailed logging for debugging
 - **Injector Logging**: Trace dependency injection operations
 - **SQLAlchemy Logging**: Trace SQL execution and database operations
 
-Logging is configured via `logger.yaml` and controlled by environment variables.
+Logging is configured via `logger.yaml`.
 
 ## Configuration File: logger.yaml
 
@@ -20,14 +20,14 @@ logger:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
   # Injector logger configuration
-  # Enable with DEBUG_INJECTOR=true environment variable
   injector:
+    enable: false  # Set to true to enable injector debug logging
     level: DEBUG
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
   # SQLAlchemy logger configuration
-  # Enable with DEBUG_SQL=true environment variable
   sqlalchemy:
+    enable: false  # Set to true to enable SQLAlchemy debug logging
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     # Engine logger: outputs SQL statements
     engine:
@@ -41,6 +41,38 @@ logger:
     # ORM logger: outputs ORM internal operations
     orm:
       level: DEBUG
+```
+
+## Enabling Debug Logging
+
+To enable debug logging, edit `logger.yaml` and set `enable: true`:
+
+### Enable Injector Logging
+
+```yaml
+injector:
+  enable: true  # Change from false to true
+  level: DEBUG
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+```
+
+### Enable SQLAlchemy Logging
+
+```yaml
+sqlalchemy:
+  enable: true  # Change from false to true
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  # ...
+```
+
+### Enable Both Loggers
+
+```yaml
+injector:
+  enable: true
+
+sqlalchemy:
+  enable: true
 ```
 
 ## Usage
@@ -58,108 +90,57 @@ INFO:batch.product_info_csv_export_processor:=== Starting Product Info CSV Expor
 ...
 ```
 
-### Injector Debug Mode
+### With Injector Logging Enabled
 
-Enable dependency injection tracing:
+After setting `injector.enable: true` in `logger.yaml`:
 
 ```bash
-# On Linux/macOS/Git Bash
-export DEBUG_INJECTOR=true && python product_info_export_main.py
-
-# On Windows CMD
-set DEBUG_INJECTOR=true && python product_info_export_main.py
-
-# On Windows PowerShell
-$env:DEBUG_INJECTOR="true"; python product_info_export_main.py
+python product_info_export_main.py
 ```
 
-### SQLAlchemy Debug Mode
+Output will include detailed dependency injection traces:
+```
+INFO:__main__:Starting Product Info CSV Export Application...
+INFO:utils.logger_utils:Injector debug logging enabled
 
-Enable SQL execution tracing:
-
-```bash
-# On Linux/macOS/Git Bash
-export DEBUG_SQL=true && python product_info_export_main.py
-
-# On Windows CMD
-set DEBUG_SQL=true && python product_info_export_main.py
-
-# On Windows PowerShell
-$env:DEBUG_SQL="true"; python product_info_export_main.py
+> Injector.get(<class 'ProductInfoCsvExportProcessorImpl'>) using <ClassProvider>
+> Creating <class 'ProductInfoCsvExportProcessorImpl'> object
+> Providing {'product_info_service': <class 'ProductInfoService'>}
+...
 ```
 
-### Combined Debug Mode
+### With SQLAlchemy Logging Enabled
 
-Enable both Injector and SQLAlchemy logging:
+After setting `sqlalchemy.enable: true` in `logger.yaml`:
 
 ```bash
-# On Linux/macOS/Git Bash
-export DEBUG_INJECTOR=true && export DEBUG_SQL=true && python product_info_export_main.py
+python product_info_export_main.py
+```
 
-# On Windows CMD
-set DEBUG_INJECTOR=true && set DEBUG_SQL=true && python product_info_export_main.py
+Output will include SQL execution details:
+```
+INFO:__main__:Starting Product Info CSV Export Application...
+INFO:utils.logger_utils:SQLAlchemy debug logging enabled
 
-# On Windows PowerShell
-$env:DEBUG_INJECTOR="true"; $env:DEBUG_SQL="true"; python product_info_export_main.py
+2025-10-05 01:00:00 - sqlalchemy.engine - INFO - SELECT DATABASE()
+2025-10-05 01:00:00 - sqlalchemy.engine - INFO - [raw sql] {}
+2025-10-05 01:00:00 - sqlalchemy.pool - DEBUG - Created new connection <pymysql.connections.Connection object at 0x...>
+...
 ```
 
 ## Debug Output Examples
 
 ### Injector Logging Output
 
-When `DEBUG_INJECTOR=true` is set, you'll see detailed dependency injection traces:
-
-```
-INFO:__main__:Starting Product Info CSV Export Application...
-INFO:__main__:Injector debug logging enabled
-
-> Injector.get(<class 'ProductInfoCsvExportProcessorImpl'>) using <ClassProvider>
-> Creating <class 'ProductInfoCsvExportProcessorImpl'> object
-> Providing {'product_info_service': <class 'ProductInfoService'>}
->> Injector.get(<class 'ProductInfoService'>) using <ClassProvider>
->> Creating <class 'ProductInfoService'> object
->> Providing {'product_info_repository': <class 'ProductInfoRepository'>}
->>> Injector.get(<class 'ProductInfoRepository'>) using <ClassProvider>
->>> Creating <class 'ProductInfoRepository'> object
->>> Providing {'db_session': <class 'Test2DatabaseSession'>}
->>>> Injector.get(<class 'Test2DatabaseSession'>, scope=SingletonScope) using <ClassProvider>
->>>> Creating <class 'Test2DatabaseSession'> object
->>>> Providing {'engine': <class 'Test2DatabaseEngine'>}
->>>>> Injector.get(<class 'Test2DatabaseEngine'>, scope=SingletonScope) using <ClassProvider>
->>>>> Creating <class 'Test2DatabaseEngine'> object
->>>>> Providing {'config': <class 'DatabaseConfig'>}
->>>>>> Injector.get(<class 'DatabaseConfig'>, scope=SingletonScope) using <ClassProvider>
->>>>>> Creating <class 'DatabaseConfig'> object
->>>>>>  -> <DatabaseConfig object>
->>>>>  -> Test2DatabaseEngine(config=<DatabaseConfig object>)
->>>>  -> <Test2DatabaseSession object>
->>>  -> ProductInfoRepository(db_session=<Test2DatabaseSession object>)
->>  -> ProductInfoService(product_info_repository=ProductInfoRepository(...))
->  -> ProductInfoCsvExportProcessorImpl(product_info_service=ProductInfoService(...))
-```
+When `injector.enable: true`, you'll see detailed dependency injection traces showing the complete dependency tree with indentation.
 
 ### SQLAlchemy Logging Output
 
-When `DEBUG_SQL=true` is set, you'll see SQL execution details:
-
-```
-INFO:__main__:Starting Product Info CSV Export Application...
-INFO:__main__:SQLAlchemy debug logging enabled
-
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - SELECT DATABASE()
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - [raw sql] {}
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - SELECT @@sql_mode
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - [raw sql] {}
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - SELECT @@lower_case_table_names
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - [raw sql] {}
-2025-10-05 01:00:00 - sqlalchemy.pool - DEBUG - Created new connection <pymysql.connections.Connection object at 0x...>
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - BEGIN (implicit)
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - SELECT products.id, products.name, products.price, products.category_id
-FROM products
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - [generated in 0.00123s] {}
-2025-10-05 01:00:00 - sqlalchemy.engine - INFO - COMMIT
-2025-10-05 01:00:00 - sqlalchemy.pool - DEBUG - Connection <pymysql.connections.Connection object at 0x...> being returned to pool
-```
+When `sqlalchemy.enable: true`, you'll see SQL execution details including:
+- SQL statements
+- Query parameters
+- Connection pool events
+- Transaction management
 
 ## Dependency Tree Visualization
 
@@ -213,35 +194,19 @@ ProductInfoCsvExportProcessorImpl
 
 ### 1. Debugging Injection Issues
 
-If you encounter dependency injection errors, enable injector logging:
-
-```bash
-DEBUG_INJECTOR=true python product_info_export_main.py
-```
+Enable `injector.enable: true` in logger.yaml to trace dependency resolution.
 
 ### 2. SQL Performance Analysis
 
-Identify slow queries and optimize database access:
-
-```bash
-DEBUG_SQL=true python product_info_export_main.py
-```
+Enable `sqlalchemy.enable: true` to identify slow queries and optimize database access.
 
 ### 3. Understanding Application Architecture
 
-Use both logs to visualize the complete application flow:
-
-```bash
-DEBUG_INJECTOR=true DEBUG_SQL=true python product_info_export_main.py
-```
+Enable both loggers to visualize the complete application flow.
 
 ### 4. Troubleshooting Database Issues
 
-Debug connection pool issues or transaction problems:
-
-```bash
-DEBUG_SQL=true python product_info_export_main.py
-```
+Use SQLAlchemy logging to debug connection pool issues or transaction problems.
 
 ## Customizing Log Levels
 
@@ -250,6 +215,7 @@ Edit `logger.yaml` to customize logging behavior:
 ```yaml
 logger:
   sqlalchemy:
+    enable: true
     engine:
       level: DEBUG  # Change to DEBUG for detailed SQL + result sets
     pool:
@@ -260,53 +226,46 @@ After editing, restart the application to apply changes.
 
 ## Disabling Logging
 
-To disable debug logging, simply run without the environment variables:
+To disable debug logging, edit `logger.yaml` and set `enable: false`:
 
-```bash
-python product_info_export_main.py
+```yaml
+injector:
+  enable: false
+
+sqlalchemy:
+  enable: false
 ```
 
-Or explicitly set to false:
-
-```bash
-DEBUG_INJECTOR=false DEBUG_SQL=false python product_info_export_main.py
-```
-
-## Integration with Other Tools
-
-The logging system integrates seamlessly with:
-- Application logging (batch processor logs)
-- Custom business logic logging
-- External log aggregation tools (e.g., ELK stack)
+No need to change environment variables or restart the system—just edit the config file and run the application.
 
 ## Best Practices
 
-1. **Development**: Enable `DEBUG_INJECTOR=true` and `DEBUG_SQL=true` during development
+1. **Development**: Enable both loggers during development for full visibility
 2. **Testing**: Use logging to verify dependency wiring and SQL execution
 3. **Production**: Disable debug logging for performance
-4. **Performance Tuning**: Use `DEBUG_SQL=true` to identify slow queries
-5. **CI/CD**: Use debug logs in failing test cases for diagnosis
+4. **Performance Tuning**: Enable SQLAlchemy logging to identify slow queries
+5. **Debugging**: Enable specific loggers based on the issue type
 
 ## Configuration Management
 
-### Environment Variables Priority
-
-Environment variables override `logger.yaml` settings:
-1. `DEBUG_INJECTOR=true` → Enables injector logging regardless of `logger.yaml`
-2. `DEBUG_SQL=true` → Enables SQLAlchemy logging regardless of `logger.yaml`
-
 ### Configuration File Location
 
-The `logger.yaml` file must be in the same directory as `product_info_export_main.py`.
+The `logger.yaml` file must be in the project root directory (same directory as the main scripts).
 
-If the file is not found, default configurations are used with a warning:
+If the file is not found, all debug logging is disabled with a warning:
 ```
-WARNING:__main__:logger.yaml not found, using default configuration
+WARNING:utils.logger_utils:logger.yaml not found, using default configuration
 ```
+
+### Default Behavior
+
+- If `logger.yaml` is missing: No debug logging
+- If `enable` field is missing: Default is `false` (disabled)
+- If level/format is missing: Uses sensible defaults
 
 ## Related Files
 
 - `logger.yaml` - Centralized logging configuration
+- `utils/logger_utils.py` - Shared logger utilities module
 - `examples/injector_logging_example.py` - Basic injector logging example
 - `examples/README.md` - Comprehensive injector logging guide
-- `product_info_export_main.py` - Main script with logging support
