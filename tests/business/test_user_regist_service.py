@@ -13,6 +13,18 @@ from app.domain.model.test1.user import User
 from app.business.vo.user_vo import UserVo
 
 
+# Transactional デコレーターのSessionHolderをモックするためのデコレーター
+def mock_transactional_session(test_func):
+    """Decorator to mock SessionHolder for Transactional decorator"""
+    def wrapper(self, *args, **kwargs):
+        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
+            mock_holder.get_session.return_value = self.mock_session
+            return test_func(self, *args, **kwargs)
+    wrapper.__name__ = test_func.__name__
+    wrapper.__doc__ = test_func.__doc__
+    return wrapper
+
+
 class TestUserRegistService:
     """Unit tests for UserRegistService class"""
 
@@ -20,6 +32,13 @@ class TestUserRegistService:
         """Setup method called before each test"""
         # Create a mock UserRepository
         self.mock_repository = Mock(spec=UserRepository)
+
+        # Create mock session for Transactional decorator
+        self.mock_session = Mock()
+        self.mock_session.begin = Mock()
+        self.mock_session.commit = Mock()
+        self.mock_session.rollback = Mock()
+        self.mock_session.close = Mock()
 
         # Create UserRegistService instance with mocked dependencies
         self.service = UserRegistService(user_repository=self.mock_repository)
@@ -38,6 +57,7 @@ class TestUserRegistService:
             is_active=is_active
         )
 
+    @mock_transactional_session
     def test_execute_single_user_success(self):
         """Test execute with single user registration success"""
         # Arrange
@@ -64,6 +84,7 @@ class TestUserRegistService:
             department_id=1
         )
 
+    @mock_transactional_session
     def test_execute_multiple_users_success(self):
         """Test execute with multiple users registration success"""
         # Arrange
@@ -116,6 +137,7 @@ class TestUserRegistService:
         assert third_call['last_name'] == "Johnson"
         assert third_call['department_id'] == 1
 
+    @mock_transactional_session
     def test_execute_empty_user_list(self):
         """Test execute with empty user list"""
         # Arrange
@@ -129,6 +151,7 @@ class TestUserRegistService:
         assert result.userCount == 0
         self.mock_repository.create_user.assert_not_called()
 
+    @mock_transactional_session
     def test_execute_user_with_minimal_fields(self):
         """Test execute with user having only required fields"""
         # Arrange
@@ -161,6 +184,7 @@ class TestUserRegistService:
         assert call_kwargs['last_name'] is None
         assert call_kwargs['department_id'] is None
 
+    @mock_transactional_session
     def test_execute_user_with_none_department_id(self):
         """Test execute with user having None department_id"""
         # Arrange
@@ -182,6 +206,7 @@ class TestUserRegistService:
         call_kwargs = self.mock_repository.create_user.call_args[1]
         assert call_kwargs['department_id'] is None
 
+    @mock_transactional_session
     def test_execute_user_repository_exception(self):
         """Test execute handles repository exceptions correctly"""
         # Arrange
@@ -198,6 +223,7 @@ class TestUserRegistService:
         assert str(exc_info.value) == "Database error"
         self.mock_repository.create_user.assert_called_once()
 
+    @mock_transactional_session
     def test_execute_partial_failure_with_multiple_users(self):
         """Test execute with partial failure in multiple users"""
         # Arrange
@@ -223,6 +249,7 @@ class TestUserRegistService:
         # Only first two users should have been attempted
         assert self.mock_repository.create_user.call_count == 2
 
+    @mock_transactional_session
     def test_execute_with_special_characters_in_fields(self):
         """Test execute with special characters in user fields"""
         # Arrange
@@ -252,6 +279,7 @@ class TestUserRegistService:
         assert call_kwargs['first_name'] == "José"
         assert call_kwargs['last_name'] == "O'Connor"
 
+    @mock_transactional_session
     def test_execute_with_different_department_ids(self):
         """Test execute with various department ID values"""
         # Arrange
@@ -287,6 +315,7 @@ class TestUserRegistService:
         self.service.__post_init__()
         assert hasattr(self.service, 'logger')
 
+    @mock_transactional_session
     @patch('app.business.user_regist_service.logging.getLogger')
     def test_logging_calls_success(self, mock_get_logger):
         """Test that appropriate logging calls are made for successful registration"""
@@ -309,6 +338,7 @@ class TestUserRegistService:
         # Should have at least: start, per-user, count, and completion messages
         assert mock_logger.info.call_count >= 4
 
+    @mock_transactional_session
     @patch('app.business.user_regist_service.logging.getLogger')
     def test_logging_calls_failure(self, mock_get_logger):
         """Test that appropriate logging calls are made for failed registration"""
@@ -333,6 +363,7 @@ class TestUserRegistService:
         assert "Failed to register user failing.user" in error_call_args
         assert "Database error" in error_call_args
 
+    @mock_transactional_session
     def test_repository_method_call_parameters(self):
         """Test that repository create_user method is called with correct parameter types"""
         # Arrange
