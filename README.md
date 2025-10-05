@@ -183,6 +183,7 @@ python -m pytest tests/business/test_category_regist_service.py -v
 │   ├── csv_import_main.py                         # ユーザー取込メインプログラム
 │   ├── csv_import_processor.py                   # CSV取込処理
 │   ├── data_batch_processor.py                   # データバッチ処理
+│   ├── main.py                                    # 共通メインプログラム
 │   ├── processor.py                              # 処理基底クラス
 │   ├── product_info_csv_export_processor.py      # 商品情報CSV出力処理
 │   ├── product_info_export_main.py                # 商品情報出力メインプログラム
@@ -252,7 +253,6 @@ python -m pytest tests/business/test_category_regist_service.py -v
 │   └── user.csv                                  # ユーザーCSVサンプル
 ├── db.yaml                                         # データベース設定
 ├── logger.yaml                                     # ロガー設定
-├── main.py                                         # 共通メインプログラム
 ├── requirements.txt                                # Python依存関係
 ├── setup.bat                                       # Windows環境セットアップ
 ├── setup.sh                                       # Linux/macOS環境セットアップ
