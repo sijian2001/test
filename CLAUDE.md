@@ -27,13 +27,13 @@ python -m pytest tests/business/test_product_info_service.py -v
 ### メインアプリケーション
 ```bash
 # ユーザー管理（test1データベース）
-python csv_import_main.py        # CSV からユーザー・部署をインポート
-python csv_export_main.py        # ユーザー情報をCSVエクスポート
+python batch/csv_import_main.py        # CSV からユーザー・部署をインポート
+python batch/csv_export_main.py        # ユーザー情報をCSVエクスポート
 
 # 商品管理（test2データベース）
-python categories_import_main.py # CSV からカテゴリをインポート
-python products_import_main.py   # CSV から商品をインポート
-python product_info_export_main.py # 商品情報をCSVエクスポート
+python batch/categories_import_main.py # CSV からカテゴリをインポート
+python batch/products_import_main.py   # CSV から商品をインポート
+python batch/product_info_export_main.py # 商品情報をCSVエクスポート
 ```
 
 ## アーキテクチャ概要

@@ -1,37 +1,18 @@
 #!/usr/bin/env python3
 
 import sys
-import logging
 import os
+import logging
+
+# Add project root to sys.path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from injector import Injector
 from batch.product_info_csv_export_processor import ProductInfoCsvExportProcessorImpl
+from utils.logger_utils import setup_application_logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
-def setup_injector_logging():
-    """
-    Enable debug logging for injector to trace dependency injection
-
-    This will output detailed information about:
-    - Dependency resolution process
-    - Provider usage
-    - Object creation
-    - Singleton behavior
-    """
-    injector_logger = logging.getLogger('injector')
-    injector_logger.setLevel(logging.DEBUG)
-
-    handler = logging.StreamHandler()
-    handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    handler.setFormatter(formatter)
-    injector_logger.addHandler(handler)
-
-    logger.info("Injector debug logging enabled")
 
 
 def main():
@@ -39,9 +20,8 @@ def main():
     try:
         logger.info("Starting Product Info CSV Export Application...")
 
-        # Enable injector logging if DEBUG environment variable is set
-        if os.getenv('DEBUG', 'false').lower() == 'true':
-            setup_injector_logging()
+        # Setup application logging (Injector and SQLAlchemy)
+        setup_application_logging()
 
         # Create injector and get processor
         injector = Injector()

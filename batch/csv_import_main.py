@@ -1,22 +1,31 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import logging
+
+# Add project root to sys.path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from injector import Injector
 from batch.csv_import_processor import DataCsvImportProcessor
+from utils.logger_utils import setup_application_logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def main():
     logger.info("Starting CSV Import Application...")
-    
+
+    # Setup application logging (Injector and SQLAlchemy)
+    setup_application_logging()
+
     injector = Injector()
 
     csv_import_processor = injector.get(DataCsvImportProcessor)
-    
+
     success = csv_import_processor.run_csv_import_process()
-    
+
     if success:
         logger.info("\nCSV import completed successfully!")
         return 0
