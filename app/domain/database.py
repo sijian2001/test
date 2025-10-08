@@ -11,6 +11,7 @@ from .model.test1.user_info import UserInfo
 from .model.test2.base import Base as Test2Base
 from .model.test2.category import Category
 from .model.test2.product import Product
+from .model.test2.active_user import ActiveUser
 from .session_holder import SessionHolder
 import yaml
 import os
@@ -110,8 +111,8 @@ class Test1DatabaseSession(Session):
     def _register_to_session_holder(self):
         """Register session factory to SessionHolder"""
         if not SessionHolder.is_registered('test1'):
-            session_factory = sessionmaker(bind=self.engine.get_engine())
-            SessionHolder.register('test1', session_factory)
+            # Register a lambda that always returns this singleton session
+            SessionHolder.register('test1', lambda: self)
 
 # Test2 Database Classes
 @inject
@@ -141,8 +142,8 @@ class Test2DatabaseSession(Session):
     def _register_to_session_holder(self):
         """Register session factory to SessionHolder"""
         if not SessionHolder.is_registered('test2'):
-            session_factory = sessionmaker(bind=self.engine.get_engine())
-            SessionHolder.register('test2', session_factory)
+            # Register a lambda that always returns this singleton session
+            SessionHolder.register('test2', lambda: self)
 
 # Legacy classes for backward compatibility (deprecated)
 #

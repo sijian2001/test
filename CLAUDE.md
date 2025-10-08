@@ -34,6 +34,9 @@ python app/batch/csv_export_main.py        # ユーザー情報をCSVエクス�
 python app/batch/categories_import_main.py # CSV からカテゴリをインポート
 python app/batch/products_import_main.py   # CSV から商品をインポート
 python app/batch/product_info_export_main.py # 商品情報をCSVエクスポート
+
+# データベース間連携（test1 → test2）
+python app/batch/active_user_sync_main.py  # test1の有効ユーザーをtest2に同期
 ```
 
 ## アーキテクチャ概要

@@ -170,6 +170,29 @@ python app/batch/products_import_main.py
 python app/batch/product_info_export_main.py
 ```
 
+### データベース間連携（test1 → test2）
+
+#### アクティブユーザー同期処理
+test1.userテーブルのis_active=Trueのユーザーを、test2.active_userテーブルに同期します：
+```bash
+python app/batch/active_user_sync_main.py
+```
+
+**処理内容:**
+1. test2.active_userの全データを削除
+2. test1.userからis_active=Trueのユーザーを取得
+3. test2.active_userに登録
+
+**注意:** この処理は毎回active_userテーブルを全削除してから再登録します。
+
+**出力例:**
+```
+Deleted 7 existing records from test2.active_user
+Found 7 active users in test1.user
+Source users (test1.user is_active=True): 7
+Registered to test2.active_user: 7
+```
+
 ### 単体テスト実行
 全ての単体テストを実行：
 ```bash

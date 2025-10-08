@@ -14,17 +14,35 @@ from app.business.vo.category_vo import CategoryVo
 from app.domain.session_holder import SessionHolder
 
 
+# Transactional デコレーターのSessionHolderをモックするためのデコレーター
+def mock_transactional_session(test_func):
+    """Decorator to mock SessionHolder for Transactional decorator"""
+    def wrapper(self, *args, **kwargs):
+        with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:
+            mock_holder.get_session.return_value = self.mock_session
+            return test_func(self, *args, **kwargs)
+    wrapper.__name__ = test_func.__name__
+    wrapper.__doc__ = test_func.__doc__
+    return wrapper
+
+
 class TestCategoryRegistService:
     """Unit tests for CategoryRegistService class"""
 
     def setup_method(self):
         """Setup method called before each test"""
+        # モックセッションの作成
+        self.mock_session = Mock()
+        self.mock_session.begin = Mock()
+        self.mock_session.commit = Mock()
+        self.mock_session.rollback = Mock()
+        self.mock_session.close = Mock()
+
         # SessionHolderをクリア
         SessionHolder.clear()
 
         # モックセッションを登録
-        mock_session = Mock()
-        SessionHolder.register('test2', lambda: mock_session)
+        SessionHolder.register('test2', lambda: self.mock_session)
 
         # Create a mock CategoryRepository
         self.mock_repository = Mock(spec=CategoryRepository)

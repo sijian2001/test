@@ -22,6 +22,7 @@ class TestTransactional:
         self.mock_session.commit = Mock()
         self.mock_session.rollback = Mock()
         self.mock_session.close = Mock()
+        self.mock_session.in_transaction = Mock(return_value=False)
 
         # SessionHolderをモック
         with patch('app.business.decorators.transactional.SessionHolder') as mock_holder:

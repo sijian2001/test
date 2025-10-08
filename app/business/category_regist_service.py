@@ -4,7 +4,7 @@ from typing import List
 from injector import inject
 import logging
 from app.business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
-from app.business.decorators.session_manager import SessionManager
+from app.business.decorators.transactional import Transactional
 from app.business.decorators.database_enum import Database
 from app.domain.repository.test2.category_repository import CategoryRepository
 from app.domain.model.test2.category import Category
@@ -33,7 +33,7 @@ class CategoryRegistService(AbstractCategoryRegistService):
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)
 
-    @SessionManager(database=Database.TEST2)
+    @Transactional(database=Database.TEST2)
     def execute(self, in_dto: CategoryRegistInDto) -> CategoryRegistOutDto:
         self.logger.info("=== Starting Category Registration ===")
 

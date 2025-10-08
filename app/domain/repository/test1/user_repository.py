@@ -39,6 +39,10 @@ class UserRepository(AbstractUserRepository):
     
     def get_user_by_id(self, user_id: int) -> Optional[User]:
         return self.session.query(User).filter(User.id == user_id).first()
+
+    def get_active_users(self) -> List[User]:
+        """Get all active users (is_active=True)"""
+        return self.session.query(User).filter(User.is_active == True).all()
     
     def create_user(self, username: str, email: str, password_hash: str, first_name: str = None, last_name: str = None, department_id: int = None) -> User:
         user = User(username=username, email=email, password_hash=password_hash, first_name=first_name, last_name=last_name, department_id=department_id)
