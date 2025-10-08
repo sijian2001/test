@@ -45,7 +45,7 @@ class DataCsvImportProcessor(CsvImportProcessor):
             
             # 4. DepartUserRegistServiceで一括登録
             self.logger.info("3. Registering departments and users...")
-            result_dto = self.depart_user_regist_service.regist_depart_user(input_dto)
+            result_dto = self.depart_user_regist_service.execute(input_dto)
             
             self.logger.info(f"Registration completed - Departments: {result_dto.departmentCount}, Users: {result_dto.userCount}")
             self.logger.info("=== CSV Import Process Completed Successfully ===")

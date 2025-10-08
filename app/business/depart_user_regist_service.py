@@ -6,7 +6,7 @@ import logging
 from app.business.abstract_service import AbstractService, AbstractInDto, AbstractOutDto
 from app.business.department_regist_service import DepartmentRegistService, DepartmentRegistInDto
 from app.business.user_regist_service import UserRegistService, UserRegistInDto
-from app.business.decorators.session_manager import SessionManager
+from app.business.decorators.transactional import Transactional
 from app.business.decorators.database_enum import Database
 from app.business.vo.department_vo import DepartmentVo
 from app.business.vo.user_vo import UserVo
@@ -40,11 +40,11 @@ class DepartUserRegistService(AbstractDepartUserRegistService):
 
     def __post_init__(self):
         self.logger = logging.getLogger(__name__)
-    
+
     def execute(self, in_dto: DepartUserRegistInDto) -> DepartUserRegistOutDto:
         return self.regist_depart_user(in_dto)
-    
-    @SessionManager(database=Database.TEST1)
+
+    @Transactional(database=Database.TEST1)
     def regist_depart_user(self, input_dto: DepartUserRegistInDto) -> DepartUserRegistOutDto:
         self.logger.info("=== Starting Department and User Registration ===")
         

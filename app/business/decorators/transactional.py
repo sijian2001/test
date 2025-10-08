@@ -239,54 +239,66 @@ class Transactional:
                 Any exception raised by the decorated method
             """
             session = None
+            is_nested = False
             try:
                 # Get session from SessionHolder
                 session = SessionHolder.get_session(self.database.value)
-                session.begin()
 
-                # ログ出力: トランザクション開始
-                mode = "read-only" if self.read_only else "read-write"
-                logger.info(
-                    f"Transaction started for {self.database.value} "
-                    f"(mode: {mode}, method: {func.__name__})"
-                )
+                # Check if transaction is already begun (nested transaction scenario)
+                if session.in_transaction():
+                    is_nested = True
+                    logger.debug(
+                        f"Transaction already active for {self.database.value}, "
+                        f"skipping begin (method: {func.__name__})"
+                    )
+                else:
+                    session.begin()
+                    # ログ出力: トランザクション開始
+                    mode = "read-only" if self.read_only else "read-write"
+                    logger.info(
+                        f"Transaction started for {self.database.value} "
+                        f"(mode: {mode}, method: {func.__name__})"
+                    )
 
                 # Execute the decorated method
                 result = func(instance, *args, **kwargs)
 
-                # Commit on success
-                session.commit()
-                logger.info(
-                    f"Transaction committed successfully for {self.database.value} "
-                    f"(method: {func.__name__})"
-                )
+                # Commit on success (only if we started the transaction)
+                if not is_nested:
+                    session.commit()
+                    logger.info(
+                        f"Transaction committed successfully for {self.database.value} "
+                        f"(method: {func.__name__})"
+                    )
                 return result
 
             except Exception as e:
-                # ロールバック判定
-                if session and self._should_rollback(e):
-                    session.rollback()
-                    # rollback_forに含まれる例外は想定内のロールバック（INFO）
-                    # それ以外は予期しないロールバック（WARNING）
-                    log_level = logging.INFO if isinstance(e, self.rollback_for) else logging.WARNING
-                    logger.log(
-                        log_level,
-                        f"Transaction rolled back due to {type(e).__name__} "
-                        f"for {self.database.value} (method: {func.__name__}): {str(e)}"
-                    )
-                elif session:
-                    # ロールバックしない場合でもコミットは試みる
-                    try:
-                        session.commit()
-                        logger.info(
-                            f"Transaction committed despite {type(e).__name__} "
-                            f"(exception in no_rollback_for) for {self.database.value}"
+                # ネストしたトランザクションの場合は、親トランザクションに処理を委ねる
+                if not is_nested:
+                    # ロールバック判定
+                    if session and self._should_rollback(e):
+                        session.rollback()
+                        # rollback_forに含まれる例外は想定内のロールバック（INFO）
+                        # それ以外は予期しないロールバック（WARNING）
+                        log_level = logging.INFO if isinstance(e, self.rollback_for) else logging.WARNING
+                        logger.log(
+                            log_level,
+                            f"Transaction rolled back due to {type(e).__name__} "
+                            f"for {self.database.value} (method: {func.__name__}): {str(e)}"
                         )
-                    except Exception as commit_error:
-                        logger.error(
-                            f"Failed to commit after no-rollback exception: "
-                            f"{str(commit_error)}"
-                        )
+                    elif session:
+                        # ロールバックしない場合でもコミットは試みる
+                        try:
+                            session.commit()
+                            logger.info(
+                                f"Transaction committed despite {type(e).__name__} "
+                                f"(exception in no_rollback_for) for {self.database.value}"
+                            )
+                        except Exception as commit_error:
+                            logger.error(
+                                f"Failed to commit after no-rollback exception: "
+                                f"{str(commit_error)}"
+                            )
 
                 # 元の例外を再送出
                 logger.error(f"Error in {func.__name__}: {str(e)}")
@@ -294,7 +306,8 @@ class Transactional:
 
             finally:
                 # セッションクローズ（Spring BootのEntityManager.close()に相当）
-                if session:
+                # ネストしたトランザクションの場合はクローズしない
+                if session and not is_nested:
                     session.close()
                     logger.info(
                         f"Session closed for {self.database.value} "
