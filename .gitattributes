@@ -1,0 +1,8 @@
+* text eol=lf
+
+# Windows batch files keep CRLF for compatibility
+*.bat text eol=crlf
+
+# Explicit binary patterns
+*.png binary
+*.svg text eol=lf

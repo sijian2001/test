@@ -357,6 +357,11 @@ python product_info_export_main.py
 └── CLAUDE.md           # 開発ガイド
 ```
 
+### 7.4 改行コードポリシー
+- すべてのテキスト資産（Pythonコード、テスト、設定ファイル、ドキュメントなど）は LF 改行で管理する。
+- `.gitattributes` に `* text eol=lf` を追加し、新規ファイルも自動的に LF へ正規化されるよう統一した。
+- `tests/test_line_endings.py` で Git 管理下のテキストファイルに CRLF が混入していないか継続的に検証する。
+
 ## 8. 今後の拡張計画
 
 ### 8.1 機能拡張
